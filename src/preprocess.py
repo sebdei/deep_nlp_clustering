@@ -1,9 +1,9 @@
 import numpy as np
-
 from keras.preprocessing.sequence import pad_sequences as keras_pad_sequenecs
 from keras.preprocessing.text import Tokenizer
 
 from model_provider import provide_glove_model
+from model_provider import provide_fasttext_model
 
 
 def build_embedding_matrix(word_index_dict, vocab_size, feature_dimension_size, model):
@@ -31,3 +31,10 @@ def preprocess_word_embedding(sentence_list):
     padded_sequences = keras_pad_sequenecs(encoded_sequences, padding='post')
 
     return (embedding_matrix, padded_sequences, vocab_size, feature_dimension_size)
+
+def createMatrixEmbedding(sentence):
+    wordEmbedding = provide_fasttext_model()
+    embedding_matrix = np.zeros((23,300))
+    for index in range(len(sentence)-1):
+        embedding_matrix[index] = wordEmbedding[sentence[index]]
+    return embedding_matrix
