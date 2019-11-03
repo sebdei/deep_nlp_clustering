@@ -2,6 +2,8 @@ import zipfile
 import numpy as np
 import os
 from urllib.request import urlretrieve
+import gensim
+import gensim.downloader as api
 
 GLOVE_MODEL_BASE_DIR = 'models'
 GLOVE_MODEL_TXT_NAME = 'glove.6B.200d.txt'
@@ -38,3 +40,8 @@ def provide_glove_model():
     print('model successfully loaded')
 
     return model
+
+def provide_fasttext_model():
+    wordEmbedding = api.load('fasttext-wiki-news-subwords-300')
+    
+    return wordEmbedding
