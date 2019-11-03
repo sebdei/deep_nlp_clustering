@@ -38,4 +38,3 @@ def createMatrixEmbedding(sentence):
     for index in range(len(sentence)-1):
         embedding_matrix[index] = wordEmbedding[sentence[index]]
     return embedding_matrix
-
