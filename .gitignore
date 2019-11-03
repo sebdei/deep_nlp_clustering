@@ -1,3 +1,4 @@
 /src/models
 *.pyc
 *.png
+.vscode/*
