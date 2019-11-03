@@ -1,53 +1,60 @@
 import numpy as np
 from keras.models import Sequential
 from keras.models import Model
-from keras.layers import LSTM, Dense, Embedding, RepeatVector, TimeDistributed
+from keras.layers import Dense, Conv2D, Flatten, MaxPooling2D, Activation, UpSampling2D
 from keras.utils import plot_model
+import pandas as pd
+import os
 
-from preprocess import preprocess_word_embedding
-
-MAX_SEQUENCE_LENGTH = 6
-
-
-def define_lstm_autoencoder_layers(embedding_matrix, vocab_size, feature_dimension_size):
-    result = Sequential()
-
-    # encoder layers
-    result.add(Embedding(vocab_size, feature_dimension_size, input_length=MAX_SEQUENCE_LENGTH, mask_zero=True, trainable=False, weights=[embedding_matrix]))
-    result.add(LSTM(2, activation='relu', input_shape=(MAX_SEQUENCE_LENGTH, feature_dimension_size)))
-    result.add(RepeatVector(MAX_SEQUENCE_LENGTH))
-
-    # decoder layers
-    result.add(LSTM(2, activation='relu', return_sequences=True))
-    result.add(TimeDistributed(Dense(feature_dimension_size)))
-
-    result.compile(optimizer='adam', loss='mse')
-    result.summary()
-
-    return result
+os.chdir("/Volumes/Files/Onedrive/Masters/Study Materials/Third Semester/Seminar-Recent Trends in Deep Learning")
 
 
-sentence_list = [
-    'Well done!',
-    'Good work',
-    'Great effort',
-    'nice work. your a good guy',
-    'Excellent!',
-    'Weak',
-    'Poor effort!',
-    'not good',
-    'poor work',
-    'Could have done better.'
-    ]
+matrix = pd.read_pickle("Word_Matrices.pkl")
+matrix = matrix[:100]
 
-embedding_matrix, padded_sequences, vocab_size, feature_dimension_size = preprocess_word_embedding(sentence_list)
-lstm_autoencoder = define_lstm_autoencoder_layers(embedding_matrix, vocab_size, feature_dimension_size)
+x_train = np.array([])
+for i in range(len(matrix)):
+    data = np.array(matrix.iloc[i,3], np.array(np.zeros(23)))
+    x_train = np.append( x_train, data)
 
-expected_output = np.array([[embedding_matrix[word_index] for word_index in encoded_sequence] for encoded_sequence in padded_sequences])
-history = lstm_autoencoder.fit(padded_sequences, expected_output, epochs=50, verbose=1)
+x_train = np.zeros(720000).reshape((100, 24,300))
 
-lstm_encoder = Model(inputs=lstm_autoencoder.inputs, outputs=lstm_autoencoder.layers[1].output)
-plot_model(lstm_encoder, show_shapes=True, to_file='lstm_encoder.png')
+x_train = x_train.reshape((100, 23,300))
 
-test = lstm_encoder.predict(padded_sequences)
-print(test)
+def define_CNN_autoencoder_layers(input_shape, filter_size, pool_size):	
+    model = Sequential()
+    
+    #1st convolution layer
+    model.add(Conv2D(16, filter_size, padding='same', input_shape=(100, 24, 300)))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=pool_size, padding='same'))
+    
+    #2nd convolution layer
+    model.add(Conv2D(2,filter_size, padding='same')) # apply 2 filters sized of (3x3)
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=pool_size, padding='same'))
+    
+    #here compressed version
+    
+    #3rd convolution layer
+    model.add(Conv2D(2,filter_size, padding='same')) # apply 2 filters sized of (3x3)
+    model.add(Activation('relu'))
+    model.add(UpSampling2D(filter_size))
+    
+    #4rd convolution layer
+    model.add(Conv2D(16,filter_size, padding='same'))
+    model.add(Activation('relu'))
+    model.add(UpSampling2D(filter_size))
+    
+    model.add(Conv2D(1,filter_size, padding='same'))
+    model.add(Activation('sigmoid'))
+
+    model.summary()
+    model.compile(optimizer='adadelta', loss='binary_crossentropy')
+    return model
+
+
+model = define_CNN_autoencoder_layers((100,24,300), (2,2), (2,2))
+
+model.fit(x_train, x_train, epochs=3)
+

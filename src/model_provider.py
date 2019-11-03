@@ -3,13 +3,18 @@ import numpy as np
 import os
 from urllib.request import urlretrieve
 import gensim
-import gensim.downloader as api
+import gzip
+import shutil
 
 GLOVE_MODEL_BASE_DIR = 'models'
 GLOVE_MODEL_TXT_NAME = 'glove.6B.200d.txt'
 GLOVE_MODEL_ZIP_NAME = 'glove.6B.zip'
 GLOVE_MODEL_URL = 'http://nlp.stanford.edu/data/glove.6B.zip'
 
+FASTTEXT_MODEL_BASE_DIR = 'FastTextModel'
+FASTTEXT_MODEL_BIN_NAME = 'cc.en.300.bin'
+FASTTEXT_MODEL_ZIP_NAME = 'cc.en.300.bin.gz'
+FASTTEXT_MODEL_URL = 'https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.en.300.bin.gz'
 
 def assure_model_exists():
     if not os.path.exists(GLOVE_MODEL_BASE_DIR):
@@ -23,6 +28,20 @@ def assure_model_exists():
         zip = zipfile.ZipFile(os.path.join(GLOVE_MODEL_BASE_DIR, GLOVE_MODEL_ZIP_NAME), 'r')
         zip.extract(GLOVE_MODEL_TXT_NAME, GLOVE_MODEL_BASE_DIR)
 
+def assure_fasttext_model_exists():
+    zipfile = os.path.join(FASTTEXT_MODEL_BASE_DIR, FASTTEXT_MODEL_ZIP_NAME)
+    binfile = os.path.join(FASTTEXT_MODEL_BASE_DIR, FASTTEXT_MODEL_BIN_NAME)
+
+    if not os.path.exists(FASTTEXT_MODEL_BASE_DIR):
+        os.makedirs(FASTTEXT_MODEL_BASE_DIR)
+
+    if not (os.path.exists(os.path.join(FASTTEXT_MODEL_BASE_DIR, FASTTEXT_MODEL_BIN_NAME))):
+        if (not os.path.exists( zipfile)):
+            print('downloading FastText model (>4GB) ...')
+            urlretrieve(FASTTEXT_MODEL_URL,  zipfile)
+        with gzip.open(zipfile, 'rb') as f_in:
+            with open(binfile, 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
 
 def provide_glove_model():
     assure_model_exists()
@@ -42,6 +61,7 @@ def provide_glove_model():
     return model
 
 def provide_fasttext_model():
-    wordEmbedding = api.load('fasttext-wiki-news-subwords-300')
+    assure_fasttext_model_exists()
+    model = gensim.models.fasttext.load_facebook_model(os.path.join(FASTTEXT_MODEL_BASE_DIR, FASTTEXT_MODEL_BIN_NAME))
     
-    return wordEmbedding
+    return model
