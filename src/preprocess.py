@@ -30,4 +30,4 @@ def preprocess_word_embedding(sentence_list):
     encoded_sequences = tokenizer.texts_to_sequences(sentence_list)
     padded_sequences = keras_pad_sequenecs(encoded_sequences, padding='post')
 
-    return (embedding_matrix, padded_sequences, vocab_size, feature_dimension_size)
+    return (embedding_matrix, padded_sequences)
