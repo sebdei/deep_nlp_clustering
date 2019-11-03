@@ -4,6 +4,6 @@ Start docker
 
 In container execute
 
-```python train.py```
+```python main.py```
 
 
