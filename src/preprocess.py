@@ -33,10 +33,11 @@ def preprocess_word_embedding(sentence_list):
     return (embedding_matrix, padded_sequences)
 
 def createFastTextMatrix(sentence):
+    #global model
     model = provide_fasttext_model()
     value = eval(sentence)
     print(len(value))
-    embedding_matrix = np.zeros((23,300))
+    embedding_matrix = np.zeros((24,300))
     for index in range(len(value)):
         embedding_matrix[index] = model.wv.get_vector(value[index])
     return embedding_matrix
