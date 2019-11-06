@@ -14,7 +14,7 @@ def define_lstm_autoencoder_layers(embedding_matrix, vocab_size, feature_dimensi
     # encoder layers
     result.add(Embedding(vocab_size, feature_dimension_size, input_length=max_sequence_length, mask_zero=True, trainable=False, weights=[embedding_matrix]))
     result.add(LSTM(32, input_shape=(max_sequence_length, feature_dimension_size), return_sequences=True))
-    result.add(LSTM(3, input_shape=(max_sequence_length, feature_dimension_size), return_sequences=False))
+    result.add(LSTM(3, return_sequences=False))
     result.add(RepeatVector(max_sequence_length))
     # decoder layers
     result.add(LSTM(3, return_sequences=True))
