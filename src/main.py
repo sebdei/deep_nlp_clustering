@@ -1,66 +1,84 @@
 import csv
 import numpy as np
-from keras.models import Sequential
 from keras.models import Model
-from keras.layers import LSTM, Dense, Embedding, RepeatVector, TimeDistributed
+from keras.optimizers import SGD
 from keras.utils import plot_model
 
 from preprocess import preprocess_word_embedding
-import matplotlib.pyplot as plt
-
-
-def define_lstm_autoencoder_layers(embedding_matrix, vocab_size, feature_dimension_size, max_sequence_length):
-    result = Sequential()
-    # encoder layers
-    result.add(Embedding(vocab_size, feature_dimension_size, input_length=max_sequence_length, mask_zero=True, trainable=False, weights=[embedding_matrix]))
-    result.add(LSTM(32, input_shape=(max_sequence_length, feature_dimension_size), return_sequences=True))
-    result.add(LSTM(3, return_sequences=False))
-    result.add(RepeatVector(max_sequence_length))
-    # decoder layers
-    result.add(LSTM(3, return_sequences=True))
-    result.add(LSTM(32, return_sequences=True))
-    result.add(TimeDistributed(Dense(feature_dimension_size)))
-    result.compile(optimizer='adam', loss='mean_squared_error',  metrics=['accuracy'])
-    result.summary()
-    return result
-
+from clustering import ClusteringLayer, get_init_cluster_center
+from lstm_autoencoder import define_lstm_autoencoder_layers
+from utils import print_features
 
 with open('data/Reviews.csv') as csvfile:
     readCSV = csv.reader(csvfile, delimiter=',')
     dates = []
     sentence_list = [row[9] for row in readCSV]
 
-sentence_list = sentence_list[:600]
-
+sentence_list = sentence_list[:500]
 embedding_matrix, padded_sequences = preprocess_word_embedding(sentence_list)
 
 vocab_size = len(embedding_matrix)
 feature_dimension_size = len(embedding_matrix[0])
 max_sequence_length = len(padded_sequences[0])
 
-lstm_autoencoder = define_lstm_autoencoder_layers(embedding_matrix, vocab_size, feature_dimension_size, max_sequence_length)
+autoencoder, encoder = define_lstm_autoencoder_layers(embedding_matrix, vocab_size, feature_dimension_size, max_sequence_length)
+plot_model(autoencoder, show_shapes=True, to_file='visualisation/lstm_autoencoder.png')
+plot_model(encoder, show_shapes=True, to_file='visualisation/lstm_encoder.png')
 
 expected_output = np.array([[embedding_matrix[word_index] for word_index in encoded_sequence] for encoded_sequence in padded_sequences])
-history = lstm_autoencoder.fit(padded_sequences, expected_output, epochs=15, verbose=1)
+history = autoencoder.fit(padded_sequences, expected_output, epochs=10, verbose=1)
 
 
-plt.clf()
-plt.plot(history.history['loss'])
-plt.plot(history.history['accuracy'])
-plt.title('Model accuratcy')
-plt.savefig('plots/model_performance.png')
-plt.clf()
+def get_target_distribution(q):
+    weight = q ** 2 / q.sum(0)
+    return (weight.T / weight.sum(1)).T
 
-lstm_encoder = Model(inputs=lstm_autoencoder.inputs, outputs=lstm_autoencoder.layers[1].output)
-# plot_model(lstm_encoder, show_shapes=True, to_file='lstm_encoder.png')
 
-latent_features = lstm_encoder.predict(padded_sequences)
+def get_cluster_assignments(similarities):
+    return [similarity_sample.argmax() for similarity_sample in similarities]
 
-x = [datapoint[0] for datapoint in latent_features]
-y = [datapoint[1] for datapoint in latent_features]
-z = [datapoint[2] for datapoint in latent_features]
 
-plt.clf()
-plt.scatter(x, y, c=z, alpha=0.5)
-plt.savefig('plots/plot.png')
-plt.clf()
+n_clusters = 3
+latent_features = encoder.predict(padded_sequences)
+init_cluster_centers = get_init_cluster_center(n_clusters, latent_features)
+
+clustering_layer = ClusteringLayer(n_clusters, weights=[init_cluster_centers], name='clustering')(encoder.output)
+cluster_model = Model(inputs=encoder.input, outputs=clustering_layer)
+cluster_model.compile(optimizer=SGD(0.01, 0.9), loss='kld')  # Kullback-leibner divergence loss
+
+similarities = cluster_model.predict(padded_sequences, verbose=0)
+cluster_count = similarities.argmax(1)
+cluster_assignments = get_cluster_assignments(similarities)
+
+scales = {
+    "min_x": min([latent_feature[0] for latent_feature in latent_features]) - 0.25,
+    "max_x": max([latent_feature[0] for latent_feature in latent_features]) + 0.25,
+    "min_y": min([latent_feature[1] for latent_feature in latent_features]) - 0.25,
+    "max_y": max([latent_feature[1] for latent_feature in latent_features]) + 0.25
+}
+print_features(features=latent_features, colors=cluster_assignments, cluster_assignments=cluster_assignments, scales=scales, i='init')
+
+maxiter = 8000
+update_interval = 140
+batch_size = 126  # wrt sample_size!
+index_array = np.arange(500)  # wrt sample_size!
+losses = []
+custer_assignment_counts = []
+
+index = 0
+
+for ite in range(int(maxiter)):
+    print(ite)
+    similarities = cluster_model.predict(padded_sequences, verbose=1)
+    if ite % update_interval == 0:
+        target_distribution = get_target_distribution(similarities)  # update the auxiliary target distribution p
+        # evaluate the clustering performance
+        # if y is not None:
+        #     acc = np.round(metrics.acc(y, y_pred), 5)
+        latent_features = encoder.predict(padded_sequences)
+        cluster_assignments = get_cluster_assignments(similarities)
+        print_features(features=latent_features, colors=cluster_assignments, cluster_assignments=cluster_assignments, scales=scales, i=ite)
+    idx = index_array[index * batch_size: min((index+1) * batch_size, padded_sequences.shape[0])]
+    loss = cluster_model.train_on_batch(x=padded_sequences[idx], y=target_distribution[idx])
+    losses.append(loss)
+    index = index + 1 if (index + 1) * batch_size <= padded_sequences.shape[0] else 0
