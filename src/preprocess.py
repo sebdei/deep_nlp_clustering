@@ -41,4 +41,32 @@ def createFastTextMatrix(sentence):
     for index in range(len(value)):
         embedding_matrix[index] = model.wv.get_vector(value[index])
     return embedding_matrix
+
+def build_embedding_matrix_fasttext(word_index_dict, vocab_size, feature_dimension_size, model):
+    # Too slow because the model is too large.
+    result = np.zeros((vocab_size, feature_dimension_size))
+    for word, i in word_index_dict.items():
+        embedding_vector = model.wv.get_vector(word)
+        if embedding_vector is not None:
+            result[i] = embedding_vector
+
+    return result
+
+def preprocess_word_embedding_fasttext(sentence_list):
+    # Too slow because the model is too large.
+    tokenizer = Tokenizer()
+    tokenizer.fit_on_texts(sentence_list)
+
+    word_index_dict = tokenizer.word_index
+    vocab_size = len(word_index_dict) + 1 
+
+    model = provide_fasttext_model()
+    feature_dimension_size = 300
+    embedding_matrix = build_embedding_matrix_fasttext(word_index_dict, vocab_size, feature_dimension_size, model)
+
+    encoded_sequences = tokenizer.texts_to_sequences(sentence_list)
+    padded_sequences = keras_pad_sequenecs(encoded_sequences, padding='post')
+
+    return (embedding_matrix, padded_sequences)
+
     
