@@ -7,7 +7,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from keras.utils import plot_model
 from CNN_Utility_Functions import 
 from CNN_Utility_Functions import CNN_autoencoder_2D,recreate_input_matrix_2d, target_distribution
-from clustering import ClusteringLayer, get_init_cluster_center
+from clustering import ClusteringLayer
 import keras.backend as K
 from sklearn.cluster import KMeans
 
@@ -28,23 +28,25 @@ autoencoder, encoder  = CNN_autoencoder_2D(x_train, (7,76), (8,100))
 
 n_clusters = 3
 maxiter = 10
-update_interval = 2
+update_interval = 3
 tol=1e-3
 index = 0
-batch_size = 20
+batch_size = 3
 
-latent_features = encoder.predict(x_train)
-init_cluster_centers = get_init_cluster_center(n_clusters, latent_features)
+# Implementation  of Deep Clustering with Convolutional Autoencoders Xifeng Guo1, Xinwang Liu1, En Zhu1, and Jianping Yin2
 
 # Define DCEC model
-clustering_layer = ClusteringLayer(n_clusters, name='clustering')(encoder.output)
-model = Model(inputs=autoencoder.input, outputs=[clustering_layer, autoencoder.output])
-model.compile(loss=['kld', 'mse'], loss_weights=[1, 1], optimizer='adam')
-model.get_layer(name='clustering').set_weights([init_cluster_centers])
-plot_model(model, show_shapes=True, to_file='clustering.png')
-
 kmeans = KMeans(n_clusters=n_clusters, n_init=20)
 y_pred = kmeans.fit_predict(encoder.predict(x_train))
+
+
+clustering_layer = ClusteringLayer(n_clusters,weights=[kmeans.cluster_centers_], name='clustering')(encoder.output)
+model = Model(inputs=autoencoder.input, outputs=[clustering_layer, autoencoder.output])
+model.compile(loss=['kld', 'mse'], loss_weights=[1, 1], optimizer='adam')
+
+
+
+plot_model(model, show_shapes=True, to_file='clustering.png')
 y_pred_last = np.copy(y_pred)
 
 for ite in range(int(maxiter)):
@@ -72,16 +74,19 @@ for ite in range(int(maxiter)):
         index += 1
     ite += 1
 
+latent_feaures = encoder.predict(x_train)
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-x =data[:,0]
-y =data[:,1]
-ax.scatter(x, y, c='r', marker='o')
+x =latent_feaures[:,0]
+y =latent_feaures[:,1]
+z =latent_feaures[:,2]
+ax.scatter(x, y, z, c=y_pred, marker='o')
 ax.set_xlabel('X Label')
 ax.set_ylabel('Y Label')
+ax.set_zlabel('Z Label')
 
 plt.show()
 
-# Implementation  of Deep Clustering with Convolutional Autoencoders Xifeng Guo1, Xinwang Liu1, En Zhu1, and Jianping Yin2
+
 
