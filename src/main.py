@@ -7,11 +7,10 @@ from keras.utils import plot_model
 from preprocess import preprocess_word_embedding
 from clustering import ClusteringLayer, get_init_cluster_center
 from lstm_autoencoder import define_lstm_autoencoder_layers
-from utils import print_features
+from utils import plot_features
 
 with open('data/Reviews.csv') as csvfile:
     readCSV = csv.reader(csvfile, delimiter=',')
-    dates = []
     sentence_list = [row[9] for row in readCSV]
 
 sentence_list = sentence_list[:500]
@@ -26,7 +25,7 @@ plot_model(autoencoder, show_shapes=True, to_file='visualisation/lstm_autoencode
 plot_model(encoder, show_shapes=True, to_file='visualisation/lstm_encoder.png')
 
 expected_output = np.array([[embedding_matrix[word_index] for word_index in encoded_sequence] for encoded_sequence in padded_sequences])
-history = autoencoder.fit(padded_sequences, expected_output, epochs=10, verbose=1)
+history = autoencoder.fit(padded_sequences, expected_output, epochs=20, verbose=1)
 
 
 def get_target_distribution(q):
@@ -38,7 +37,7 @@ def get_cluster_assignments(similarities):
     return [similarity_sample.argmax() for similarity_sample in similarities]
 
 
-n_clusters = 3
+n_clusters = 2
 latent_features = encoder.predict(padded_sequences)
 init_cluster_centers = get_init_cluster_center(n_clusters, latent_features)
 
@@ -56,10 +55,10 @@ scales = {
     "min_y": min([latent_feature[1] for latent_feature in latent_features]) - 0.25,
     "max_y": max([latent_feature[1] for latent_feature in latent_features]) + 0.25
 }
-print_features(features=latent_features, colors=cluster_assignments, cluster_assignments=cluster_assignments, scales=scales, i='init')
+plot_features(features=latent_features, colors=cluster_assignments, cluster_assignments=cluster_assignments, scales=scales, i='init')
 
-maxiter = 8000
-update_interval = 140
+maxiter = 1100
+update_interval = 120
 batch_size = 126  # wrt sample_size!
 index_array = np.arange(500)  # wrt sample_size!
 losses = []
@@ -77,7 +76,7 @@ for ite in range(int(maxiter)):
         #     acc = np.round(metrics.acc(y, y_pred), 5)
         latent_features = encoder.predict(padded_sequences)
         cluster_assignments = get_cluster_assignments(similarities)
-        print_features(features=latent_features, colors=cluster_assignments, cluster_assignments=cluster_assignments, scales=scales, i=ite)
+        plot_features(features=latent_features, colors=cluster_assignments, cluster_assignments=cluster_assignments, scales=scales, i=ite)
     idx = index_array[index * batch_size: min((index+1) * batch_size, padded_sequences.shape[0])]
     loss = cluster_model.train_on_batch(x=padded_sequences[idx], y=target_distribution[idx])
     losses.append(loss)
