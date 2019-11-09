@@ -32,8 +32,9 @@ def preprocess_word_embedding(sentence_list):
 
     return (embedding_matrix, padded_sequences)
 
+
 def createFastTextMatrix(sentence):
-    #global model
+    # global model
     model = provide_fasttext_model()
     value = eval(sentence)
     print(len(value))
