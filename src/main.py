@@ -50,10 +50,10 @@ cluster_count = similarities.argmax(1)
 cluster_assignments = get_cluster_assignments(similarities)
 
 scales = {
-    "min_x": min([latent_feature[0] for latent_feature in latent_features]) - 0.25,
-    "max_x": max([latent_feature[0] for latent_feature in latent_features]) + 0.25,
-    "min_y": min([latent_feature[1] for latent_feature in latent_features]) - 0.25,
-    "max_y": max([latent_feature[1] for latent_feature in latent_features]) + 0.25
+    "min_x": min([latent_feature[0] for latent_feature in latent_features]) - 0.2,
+    "max_x": max([latent_feature[0] for latent_feature in latent_features]) + 0.2,
+    "min_y": min([latent_feature[1] for latent_feature in latent_features]) - 0.2,
+    "max_y": max([latent_feature[1] for latent_feature in latent_features]) + 0.2
 }
 plot_features(features=latent_features, colors=cluster_assignments, cluster_assignments=cluster_assignments, scales=scales, i='init')
 
