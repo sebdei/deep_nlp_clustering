@@ -78,7 +78,7 @@ def CNN_autoencoder_2D(x_train, filter_size, pool_size):
     model.add(Conv2DTranspose(1,pool_size, padding='valid', activation='sigmoid'))
     model.summary()
     
-    model.compile(optimizer='adadelta', loss='binary_crossentropy')
+    model.compile(optimizer='adadelta', loss='mse')
     model.fit(x_train, x_train, epochs=10)
     bottleneck = model.get_layer('bottleneck')
     encoder = Model(input=model.input, output=bottleneck.output)

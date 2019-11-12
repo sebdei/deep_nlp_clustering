@@ -5,33 +5,33 @@ import os
 import matplotlib.pyplot as plt, numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 from keras.utils import plot_model
-from CNN_Utility_Functions import 
 from CNN_Utility_Functions import CNN_autoencoder_2D,recreate_input_matrix_2d, target_distribution
 from clustering import ClusteringLayer
 import keras.backend as K
 from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
 
 
 #os.chdir("/Volumes/Files/Onedrive/Masters/Study Materials/Third Semester/Seminar-Recent Trends in Deep Learning")
 #os.chdir("/Users/kevin/Downloads")
-n_data = 100
+n_data = 1000
 
 matrix = pd.read_pickle("Word_Matrices.pkl")
 matrix = matrix[:n_data]
 
 x_train = recreate_input_matrix_2d(matrix, 3,n_data, 24, 300)
 
-autoencoder, encoder  = CNN_autoencoder_2D(x_train, (7,76), (8,100))
+autoencoder, encoder  = CNN_autoencoder_2D(x_train, (2,2), (8,100))
 
 
 
 
-n_clusters = 3
-maxiter = 10
+n_clusters = 2
+maxiter = 5
 update_interval = 3
 tol=1e-3
 index = 0
-batch_size = 3
+batch_size = 10
 
 # Implementation  of Deep Clustering with Convolutional Autoencoders Xifeng Guo1, Xinwang Liu1, En Zhu1, and Jianping Yin2
 
@@ -45,9 +45,9 @@ model = Model(inputs=autoencoder.input, outputs=[clustering_layer, autoencoder.o
 model.compile(loss=['kld', 'mse'], loss_weights=[1, 1], optimizer='adam')
 
 
-
 plot_model(model, show_shapes=True, to_file='clustering.png')
 y_pred_last = np.copy(y_pred)
+
 
 for ite in range(int(maxiter)):
     if ite % update_interval == 0:
@@ -76,16 +76,12 @@ for ite in range(int(maxiter)):
 
 latent_feaures = encoder.predict(x_train)
 
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-x =latent_feaures[:,0]
-y =latent_feaures[:,1]
-z =latent_feaures[:,2]
-ax.scatter(x, y, z, c=y_pred, marker='o')
-ax.set_xlabel('X Label')
-ax.set_ylabel('Y Label')
-ax.set_zlabel('Z Label')
+y_pred_temp,_ =  model.predict(x_train)
+y_pred_temp.argmax(1)
 
+fig = plt.figure()
+plt.title("Tweets of Airline Complaints")
+plt.scatter(latent_feaures[:,0], latent_feaures[:,1], c=y_pred)
 plt.show()
 
 
