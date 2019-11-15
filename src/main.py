@@ -46,7 +46,8 @@ scales = {
 utils.plot_2d_features(features=latent_features, cluster_assignments=cluster_assignments, scales=scales, i='init')
 
 
-# do soft assignment hardening
+# do Soft Assignment Hardening
+
 max_iterations = 1200
 update_interval = 120
 batch_size = 126
@@ -55,7 +56,7 @@ index_array = np.arange(AMOUNT_SEQUENCES)
 losses = []
 batch_index = 0
 for i in range(int(max_iterations)):
-    print("iteration: %0d" % (i))
+    print("Iteration: %1d / %1d" % (i, max_iterations))
     similarity_scores = encoder_cluster_model.predict(padded_sequences, verbose=1)
     if i % update_interval == 0:
         target_distribution = clustering.get_target_distribution(similarity_scores)
