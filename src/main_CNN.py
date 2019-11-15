@@ -24,14 +24,12 @@ x_train = recreate_input_matrix_2d(matrix, 3,n_data, 24, 300)
 autoencoder, encoder  = CNN_autoencoder_2D(x_train, (2,2), (8,100))
 
 
-
-
 n_clusters = 2
 maxiter = 5
 update_interval = 3
 tol=1e-3
 index = 0
-batch_size = 10
+batch_size = 200
 
 # Implementation  of Deep Clustering with Convolutional Autoencoders Xifeng Guo1, Xinwang Liu1, En Zhu1, and Jianping Yin2
 
