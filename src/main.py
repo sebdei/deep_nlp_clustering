@@ -28,7 +28,7 @@ history = autoencoder.fit(padded_sequences, expected_autoencoder_output, epochs=
 # Autoencoder was trained - start clustering
 
 latent_features = encoder.predict(padded_sequences)
-init_cluster_centers = clustering.get_init_cluster_center(NUM_CLUSTERS, latent_features)
+init_cluster_centers = clustering.get_init_kmeans_cluster_centers(NUM_CLUSTERS, latent_features)
 
 clustering_layer = clustering.ClusteringLayer(NUM_CLUSTERS, weights=[init_cluster_centers], name='clustering')(encoder.output)
 encoder_cluster_model = Model(inputs=encoder.input, outputs=clustering_layer)
@@ -37,13 +37,10 @@ encoder_cluster_model.compile(optimizer=SGD(0.01, 0.9), loss='kld')  # Kullback-
 similarity_scores = encoder_cluster_model.predict(padded_sequences, verbose=0)
 cluster_assignments = clustering.get_cluster_assignments(similarity_scores)
 
-scales = {
-    "min_x": min([latent_feature[0] for latent_feature in latent_features]) - 0.2,
-    "max_x": max([latent_feature[0] for latent_feature in latent_features]) + 0.2,
-    "min_y": min([latent_feature[1] for latent_feature in latent_features]) - 0.2,
-    "max_y": max([latent_feature[1] for latent_feature in latent_features]) + 0.2
-}
-utils.plot_2d_features(features=latent_features, cluster_assignments=cluster_assignments, scales=scales, i='init')
+
+# OPTIONAL: Plotting if latent features dimensions = 2
+plot_scales = utils.get_plot_plot_scales(latent_features)
+utils.plot_2d_features(features=latent_features, cluster_assignments=cluster_assignments, scales=plot_scales, i='init')
 
 
 # do Soft Assignment Hardening
@@ -65,7 +62,7 @@ for i in range(int(max_iterations)):
         #     acc = np.round(metrics.acc(y, y_pred), 5)
         latent_features = encoder.predict(padded_sequences)
         cluster_assignments = clustering.get_cluster_assignments(similarity_scores)
-        utils.plot_2d_features(features=latent_features, cluster_assignments=cluster_assignments, scales=scales, i=i)
+        utils.plot_2d_features(features=latent_features, cluster_assignments=cluster_assignments, scales=plot_scales, i=i)
     idx = index_array[batch_index * batch_size: min((batch_index+1) * batch_size, padded_sequences.shape[0])]
     loss = encoder_cluster_model.train_on_batch(x=padded_sequences[idx], y=target_distribution[idx])
     losses.append(loss)

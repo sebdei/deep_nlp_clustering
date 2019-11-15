@@ -19,3 +19,12 @@ def plot_2d_features(features, cluster_assignments=None, scales=None, i=1):
 
     plt.savefig('visualisation/plot{0}.png'.format(i))
     plt.clf()
+
+
+def get_plot_scales(latent_features):
+    return {
+        "min_x": min([latent_feature[0] for latent_feature in latent_features]) - 0.2,
+        "max_x": max([latent_feature[0] for latent_feature in latent_features]) + 0.2,
+        "min_y": min([latent_feature[1] for latent_feature in latent_features]) - 0.2,
+        "max_y": max([latent_feature[1] for latent_feature in latent_features]) + 0.2
+    }

@@ -33,14 +33,14 @@ class ClusteringLayer(Layer):
         return input_shape[0], self.n_clusters
 
 
-def get_init_cluster_center(n_clusters, latent_features):
+def get_init_kmeans_cluster_centers(n_clusters, latent_features):
     kmeans = KMeans(n_clusters=n_clusters, n_init=20, n_jobs=4)
     kmeans.fit_predict(latent_features)
     return kmeans.cluster_centers_
 
 
-def get_target_distribution(q):
-    weight = q ** 2 / q.sum(0)
+def get_target_distribution(similarity_scores):
+    weight = similarity_scores ** 2 / similarity_scores.sum(0)
     return (weight.T / weight.sum(1)).T
 
 
