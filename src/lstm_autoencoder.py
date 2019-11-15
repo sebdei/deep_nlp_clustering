@@ -1,7 +1,9 @@
 from keras.layers import Dense, Embedding, LSTM, RepeatVector, TimeDistributed
 from keras.models import Model, Sequential
+from keras.utils import plot_model
 
-LAST_ENCODER_LAYER = "last_encoder_layer"
+
+LAST_ENCODER_LAYER_KEY = "last_encoder_layer"
 
 
 def define_lstm_autoencoder_layers(embedding_matrix, vocab_size, feature_dimension_size, max_sequence_length):
@@ -9,8 +11,8 @@ def define_lstm_autoencoder_layers(embedding_matrix, vocab_size, feature_dimensi
 
     # encoder layers
     lstm_autoencoder.add(Embedding(vocab_size, feature_dimension_size, input_length=max_sequence_length, mask_zero=True, trainable=False, weights=[embedding_matrix]))
-    lstm_autoencoder.add(LSTM(2, input_shape=(max_sequence_length, feature_dimension_size), return_sequences=False, name=LAST_ENCODER_LAYER))
-    # lstm_autoencoder.add(LSTM(2, return_sequences=False, name=LAST_ENCODER_LAYER))
+    lstm_autoencoder.add(LSTM(2, input_shape=(max_sequence_length, feature_dimension_size), return_sequences=False, name=LAST_ENCODER_LAYER_KEY))
+    # lstm_autoencoder.add(LSTM(2, return_sequences=False, name=LAST_ENCODER_LAYER_KEY))
     lstm_autoencoder.add(RepeatVector(max_sequence_length))  # Repeatvector for seq2seq lstm
 
     # decoder layers
@@ -20,7 +22,10 @@ def define_lstm_autoencoder_layers(embedding_matrix, vocab_size, feature_dimensi
     lstm_autoencoder.compile(optimizer='adam', loss='mean_squared_error',  metrics=['accuracy'])
     lstm_autoencoder.summary()
 
-    encoder_output = lstm_autoencoder.get_layer(LAST_ENCODER_LAYER).output
+    encoder_output = lstm_autoencoder.get_layer(LAST_ENCODER_LAYER_KEY).output
     lstm_encoder = Model(inputs=lstm_autoencoder.inputs, outputs=encoder_output)
+
+    plot_model(lstm_autoencoder, show_shapes=True, to_file='visualisation/lstm_autoencoder.png')
+    plot_model(lstm_encoder, show_shapes=True, to_file='visualisation/lstm_encoder.png')
 
     return lstm_autoencoder, lstm_encoder

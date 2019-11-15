@@ -3,12 +3,6 @@ from keras.layers import Layer, InputSpec
 import keras.backend as K
 
 
-def get_init_cluster_center(n_clusters, latent_features):
-    kmeans = KMeans(n_clusters=n_clusters, n_init=20, n_jobs=4)
-    kmeans.fit_predict(latent_features)
-    return kmeans.cluster_centers_
-
-
 class ClusteringLayer(Layer):
 
     def __init__(self, n_clusters, weights=None, alpha=1.0, **kwargs):
@@ -37,3 +31,18 @@ class ClusteringLayer(Layer):
     def compute_output_shape(self, input_shape):
         assert input_shape and len(input_shape) == 2
         return input_shape[0], self.n_clusters
+
+
+def get_init_cluster_center(n_clusters, latent_features):
+    kmeans = KMeans(n_clusters=n_clusters, n_init=20, n_jobs=4)
+    kmeans.fit_predict(latent_features)
+    return kmeans.cluster_centers_
+
+
+def get_target_distribution(q):
+    weight = q ** 2 / q.sum(0)
+    return (weight.T / weight.sum(1)).T
+
+
+def get_cluster_assignments(similarities):
+    return [similarity_sample.argmax() for similarity_sample in similarities]

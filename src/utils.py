@@ -2,11 +2,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_features(features, colors=None, cluster_assignments=None, scales=None, i=1):
+def plot_2d_features(features, cluster_assignments=None, scales=None, i=1):
     x = [datapoint[0] for datapoint in features]
     y = [datapoint[1] for datapoint in features]
+
     plt.clf()
-    plt.scatter(x, y, c=colors, alpha=0.5)
+    plt.scatter(x, y, c=cluster_assignments, alpha=0.5)
     plt.title("i = {0}".format(i))
 
     if scales is not None:

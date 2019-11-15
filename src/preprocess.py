@@ -38,10 +38,11 @@ def createFastTextMatrix(sentence):
     model = provide_fasttext_model()
     value = eval(sentence)
     print(len(value))
-    embedding_matrix = np.zeros((24,300))
+    embedding_matrix = np.zeros((24, 300))
     for index in range(len(value)):
         embedding_matrix[index] = model.wv.get_vector(value[index])
     return embedding_matrix
+
 
 def build_embedding_matrix_fasttext(word_index_dict, vocab_size, feature_dimension_size, model):
     # Too slow because the model is too large.
@@ -53,13 +54,14 @@ def build_embedding_matrix_fasttext(word_index_dict, vocab_size, feature_dimensi
 
     return result
 
+
 def preprocess_word_embedding_fasttext(sentence_list):
     # Too slow because the model is too large.
     tokenizer = Tokenizer()
     tokenizer.fit_on_texts(sentence_list)
 
     word_index_dict = tokenizer.word_index
-    vocab_size = len(word_index_dict) + 1 
+    vocab_size = len(word_index_dict) + 1
 
     model = provide_fasttext_model()
     feature_dimension_size = 300
@@ -69,5 +71,3 @@ def preprocess_word_embedding_fasttext(sentence_list):
     padded_sequences = keras_pad_sequenecs(encoded_sequences, padding='post')
 
     return (embedding_matrix, padded_sequences)
-
-    
