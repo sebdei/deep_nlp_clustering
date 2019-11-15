@@ -22,7 +22,7 @@ max_sequence_length = len(padded_sequences[0])
 autoencoder, encoder = lstm_autoencoder.define_lstm_autoencoder_layers(embedding_matrix, vocab_size, feature_dimension_size, max_sequence_length)
 
 expected_autoencoder_output = np.array([[embedding_matrix[word_index] for word_index in encoded_sequence] for encoded_sequence in padded_sequences])
-history = autoencoder.fit(padded_sequences, expected_autoencoder_output, epochs=1, verbose=1)
+history = autoencoder.fit(padded_sequences, expected_autoencoder_output, epochs=5, verbose=1)
 
 
 # Autoencoder was trained - start clustering
@@ -39,7 +39,7 @@ cluster_assignments = clustering.get_cluster_assignments(similarity_scores)
 
 
 # OPTIONAL: Plotting if latent features dimensions = 2
-plot_scales = utils.get_plot_plot_scales(latent_features)
+plot_scales = utils.get_plot_scales(latent_features)
 utils.plot_2d_features(features=latent_features, cluster_assignments=cluster_assignments, scales=plot_scales, i='init')
 
 
