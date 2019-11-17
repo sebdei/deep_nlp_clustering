@@ -5,3 +5,4 @@
 **/.DS_Store
 models/glove.6B.200d.txt
 models/glove.6B.zip
+/src/data/*
