@@ -11,7 +11,8 @@ services:
   jupyter:
     build: jupyter
     volumes:
-      - ./jupyter:/home/user_name/work     
+      - ./jupyter:/home/user_name/work
+      - ./src:/home/user_name/work/src
     ports:
       - 8888:8888
     user: root
