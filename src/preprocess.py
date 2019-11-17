@@ -2,8 +2,7 @@ import numpy as np
 from keras.preprocessing.sequence import pad_sequences as keras_pad_sequenecs
 from keras.preprocessing.text import Tokenizer
 
-from model_provider import provide_glove_model
-from model_provider import provide_fasttext_model
+import model_provider
 
 
 def build_embedding_matrix(word_index_dict, vocab_size, feature_dimension_size, model):
@@ -22,7 +21,7 @@ def preprocess_word_embedding(sequence_list):
     word_index_dict = tokenizer.word_index
     vocab_size = len(word_index_dict) + 1  # +1 for zero padding ???
 
-    glove_model = provide_glove_model()
+    glove_model = model_provider.provide_glove_model()
     feature_dimension_size = 200
     embedding_matrix = build_embedding_matrix(word_index_dict, vocab_size, feature_dimension_size, glove_model)
 
@@ -34,7 +33,7 @@ def preprocess_word_embedding(sequence_list):
 
 def createFastTextMatrix(sentence):
     # global model
-    model = provide_fasttext_model()
+    model = model_provider.provide_fasttext_model()
     value = eval(sentence)
     print(len(value))
     embedding_matrix = np.zeros((24, 300))
@@ -62,7 +61,7 @@ def preprocess_word_embedding_fasttext(sequence_list):
     word_index_dict = tokenizer.word_index
     vocab_size = len(word_index_dict) + 1
 
-    model = provide_fasttext_model()
+    model = model_provider.provide_fasttext_model()
     feature_dimension_size = 300
     embedding_matrix = build_embedding_matrix_fasttext(word_index_dict, vocab_size, feature_dimension_size, model)
 
