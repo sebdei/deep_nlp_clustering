@@ -8,3 +8,17 @@ services:
     tty: true
     stdin_open: true
     privileged: true
+  jupyter:
+    build: jupyter
+    volumes:
+      - ./jupyter:/home/user_name/work     
+    ports:
+      - 8888:8888
+    user: root
+    environment:
+      NB_USER: user_name
+      NB_UID: 1008
+      NB_GID: 1011
+      CHOWN_HOME: 'yes'
+      CHOWN_HOME_OPTS: -R
+    tty: true
