@@ -2,7 +2,7 @@ For starting python docker
 
 ```docker-compose run python```
 
-To start jupyter notebook
+For starting jupyter notebook
 
 ```docker-compose run --service-ports jupyter```
 
