@@ -12,13 +12,12 @@ def build_embedding_matrix(word_index_dict, vocab_size, feature_dimension_size, 
         embedding_vector = model.get(word)
         if embedding_vector is not None:
             result[i] = embedding_vector
-
     return result
 
 
-def preprocess_word_embedding(sentence_list):
+def preprocess_word_embedding(sequence_list):
     tokenizer = Tokenizer()
-    tokenizer.fit_on_texts(sentence_list)
+    tokenizer.fit_on_texts(sequence_list)
 
     word_index_dict = tokenizer.word_index
     vocab_size = len(word_index_dict) + 1  # +1 for zero padding ???
@@ -27,7 +26,7 @@ def preprocess_word_embedding(sentence_list):
     feature_dimension_size = 200
     embedding_matrix = build_embedding_matrix(word_index_dict, vocab_size, feature_dimension_size, glove_model)
 
-    encoded_sequences = tokenizer.texts_to_sequences(sentence_list)
+    encoded_sequences = tokenizer.texts_to_sequences(sequence_list)
     padded_sequences = keras_pad_sequenecs(encoded_sequences, padding='post')
 
     return (embedding_matrix, padded_sequences)
@@ -55,10 +54,10 @@ def build_embedding_matrix_fasttext(word_index_dict, vocab_size, feature_dimensi
     return result
 
 
-def preprocess_word_embedding_fasttext(sentence_list):
+def preprocess_word_embedding_fasttext(sequence_list):
     # Too slow because the model is too large.
     tokenizer = Tokenizer()
-    tokenizer.fit_on_texts(sentence_list)
+    tokenizer.fit_on_texts(sequence_list)
 
     word_index_dict = tokenizer.word_index
     vocab_size = len(word_index_dict) + 1
@@ -67,7 +66,7 @@ def preprocess_word_embedding_fasttext(sentence_list):
     feature_dimension_size = 300
     embedding_matrix = build_embedding_matrix_fasttext(word_index_dict, vocab_size, feature_dimension_size, model)
 
-    encoded_sequences = tokenizer.texts_to_sequences(sentence_list)
+    encoded_sequences = tokenizer.texts_to_sequences(sequence_list)
     padded_sequences = keras_pad_sequenecs(encoded_sequences, padding='post')
 
     return (embedding_matrix, padded_sequences)
