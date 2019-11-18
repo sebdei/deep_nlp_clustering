@@ -1,6 +1,9 @@
 import numpy as np
 from keras.preprocessing.sequence import pad_sequences as keras_pad_sequenecs
 from keras.preprocessing.text import Tokenizer
+from nltk.tokenize import word_tokenize 
+import nltk
+from nltk.corpus import stopwords
 
 import model_provider
 
@@ -32,11 +35,11 @@ def preprocess_word_embedding(sequence_list):
 
 
 def createFastTextMatrix(sentence):
-    # global model
+    #model = provide_fasttext_model()
     model = model_provider.provide_fasttext_model()
     value = eval(sentence)
     print(len(value))
-    embedding_matrix = np.zeros((24, 300))
+    embedding_matrix = np.zeros((2000, 300))
     for index in range(len(value)):
         embedding_matrix[index] = model.wv.get_vector(value[index])
     return embedding_matrix
@@ -69,3 +72,9 @@ def preprocess_word_embedding_fasttext(sequence_list):
     padded_sequences = keras_pad_sequenecs(encoded_sequences, padding='post')
 
     return (embedding_matrix, padded_sequences)
+
+def removeStopWords(text):
+    en_stop = set(stopwords.words('english'))
+    word_tokens = word_tokenize(text) 
+    filtered_sentence = [w for w in word_tokens if not w in en_stop] 
+    return filtered_sentence
