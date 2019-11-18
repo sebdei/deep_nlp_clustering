@@ -16,7 +16,7 @@ dataset = dataset[['Score', 'Text']]
 dataset['Text'] = dataset['Text'].apply(lambda x : re.sub(r'[^\w\s]',"",re.sub("[!.#$%^&*()]","", x)).lower())
 dataset['Text'] = dataset['Text'].apply(lambda x : removeStopWords(x))
 dataset.to_csv("clean.csv") #save the intermediate dataframe
-dataset = pd.read_csv("clean.csv")
+dataset = pd.read_csv("clean.csv") 
 
 #Get max words
 dataset['Text'].map(len).max() #1975 words
@@ -27,6 +27,6 @@ for i in range(len(dataset)):
     print("index") 
     print(i)
     print("array")
-    matrix = matrix.append({'Rating': dataset.iloc[i,0], 'CleanedText': dataset.iloc[i,1],'WordMatrix':createFastTextMatrix(dataset.iloc[i,1])}, ignore_index=True)
+    matrix = matrix.append({'Rating': dataset.iloc[i,1], 'CleanedText': dataset.iloc[i,2],'WordMatrix':createFastTextMatrix(dataset.iloc[i,2])}, ignore_index=True)
 
 matrix.to_pickle("Word_Matrices.pkl")

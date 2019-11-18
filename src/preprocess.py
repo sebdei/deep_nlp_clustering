@@ -35,8 +35,8 @@ def preprocess_word_embedding(sequence_list):
 
 
 def createFastTextMatrix(sentence):
-    #model = provide_fasttext_model()
-    model = model_provider.provide_fasttext_model()
+    model = provide_fasttext_model()
+    #model = model_provider.provide_fasttext_model()
     value = eval(sentence)
     print(len(value))
     embedding_matrix = np.zeros((2000, 300))
