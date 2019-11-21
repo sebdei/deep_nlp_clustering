@@ -13,6 +13,4 @@ def provide_sequence_list(amount=-1):
 
 def provide_bbc_sequence_list():
     data = load_files("./data/bbc/", encoding="utf-8", decode_error="replace")
-    df = pd.DataFrame(list(zip(data['data'], data['target'])), columns=['text', 'label'])
-
-    return df['text']
+    return pd.DataFrame(list(zip(data['data'], data['target'])), columns=['text', 'label'])
