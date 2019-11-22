@@ -9,9 +9,6 @@ import preprocess
 import text_provider
 import pretrain_lstm_autoencoder
 
-NUM_CLUSTERS = 5
-AMOUNT_SEQUENCES = 2225
-
 df = text_provider.provide_bbc_sequence_list()
 embedding_matrix, padded_sequences = preprocess.preprocess_word_embedding(df.text)
 
@@ -24,6 +21,8 @@ encoder_output = autoencoder.get_layer(pretrain_lstm_autoencoder.LAST_ENCODER_LA
 encoder = Model(inputs=autoencoder.inputs, outputs=encoder_output)
 
 latent_features = encoder.predict(padded_sequences)
+
+NUM_CLUSTERS = 5
 init_cluster_centers = clustering_utils.get_init_kmeans_cluster_centers(NUM_CLUSTERS, latent_features)
 
 clustering_layer = clustering_utils.ClusteringLayer(NUM_CLUSTERS, weights=[init_cluster_centers], name='clustering')(encoder.output)
