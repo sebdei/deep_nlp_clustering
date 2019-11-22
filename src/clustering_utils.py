@@ -16,7 +16,7 @@ class ClusteringLayer(Layer):
         input_dim = input_shape[1]
 
         self.input_spec = InputSpec(dtype=K.floatx(), shape=(None, input_dim))
-        self.clusters = self.add_weight(name='cluster', shape=(self.n_clusters, input_dim), initializer='uniform')
+        self.clusters = self.add_weight(name="cluster", shape=(self.n_clusters, input_dim), initializer="uniform")
         self.set_weights(self.initial_weights)
 
         super(ClusteringLayer, self).build(input_shape)
@@ -31,6 +31,11 @@ class ClusteringLayer(Layer):
     def compute_output_shape(self, input_shape):
         assert input_shape and len(input_shape) == 2
         return input_shape[0], self.n_clusters
+
+    def get_config(self):
+        config = {"n_clusters": self.n_clusters}
+        base_config = super(ClusteringLayer, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))
 
 
 def get_init_kmeans_cluster_centers(n_clusters, latent_features):

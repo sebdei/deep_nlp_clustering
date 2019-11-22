@@ -8,3 +8,4 @@ models/glove.6B.zip
 /src/data/*
 
 *.ipynb
+*.h5
