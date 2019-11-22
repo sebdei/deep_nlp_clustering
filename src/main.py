@@ -7,6 +7,7 @@ import tensorflow as tf
 import clustering_utils
 import preprocess
 import text_provider
+import pretrain_lstm_autoencoder
 
 NUM_CLUSTERS = 5
 AMOUNT_SEQUENCES = 2225
@@ -18,10 +19,8 @@ embedding_matrix, padded_sequences = preprocess.preprocess_word_embedding(df.tex
 gpus = tf.config.experimental.list_physical_devices('GPU')
 tf.config.experimental.set_memory_growth(gpus[0], True)
 
-autoencoder = load_model('models/autoencoder_trained.h5')
-
-LAST_ENCODER_LAYER_KEY = "last_encoder_layer"
-encoder_output = autoencoder.get_layer(LAST_ENCODER_LAYER_KEY).output
+autoencoder = load_model(pretrain_lstm_autoencoder.MODEL_PATH)
+encoder_output = autoencoder.get_layer(pretrain_lstm_autoencoder.LAST_ENCODER_LAYER_KEY).output
 encoder = Model(inputs=autoencoder.inputs, outputs=encoder_output)
 
 latent_features = encoder.predict(padded_sequences)
@@ -41,7 +40,7 @@ clusterings_result = pd.DataFrame({'clustering_init': cluster_assignments})
 
 max_iterations = 2500
 update_interval = 120
-batch_size = 16  # wrt to AMOUNT_SEQUENCES!!
+batch_size = 16
 index_array = np.arange(len(df.index))
 
 losses = []
