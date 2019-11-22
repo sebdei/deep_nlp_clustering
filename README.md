@@ -31,6 +31,10 @@ docker run --gpus all -it  \
 sebdei/tensorflow-gpu:latest
 ```
 
+Check GPU activity
+````
+nvidia-smi -l 1
+```
 
 Jupyter
 ==========
@@ -40,3 +44,5 @@ Start docker
 ```
 docker-compose run --service-ports jupyter
 ```
+
+
