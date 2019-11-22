@@ -11,12 +11,12 @@ MODEL_PATH = "./models/autoencoder_trained.h5"
 
 
 def plot_history(history):
-    plt.plot(history.history['accuracy'])
-    plt.title('Model accuracy')
-    plt.ylabel('Accuracy')
-    plt.xlabel('Epoch')
+    plt.plot(history.history["accuracy"])
+    plt.title("Model accuracy")
+    plt.ylabel("Accuracy")
+    plt.xlabel("Epoch")
     plt.show()
-    plt.savefig('visualization/history.png')
+    plt.savefig("visualization/history.png")
 
 
 def define_lstm_autoencoder_layers(embedding_matrix, vocab_size, feature_dimension_size, max_sequence_length):
@@ -34,7 +34,7 @@ def define_lstm_autoencoder_layers(embedding_matrix, vocab_size, feature_dimensi
     autoencoder.add(LSTM(64, return_sequences=True))
     autoencoder.add(TimeDistributed(Dense(feature_dimension_size)))
 
-    autoencoder.compile(optimizer='adam', loss='mean_absolute_error',  metrics=['accuracy'])
+    autoencoder.compile(optimizer="adam", loss="mean_absolute_error",  metrics=["accuracy"])
     autoencoder.summary()
 
     return autoencoder
@@ -57,5 +57,5 @@ def pretrain_lstm_autoencoder():
 
     expected_autoencoder_output = np.array([[embedding_matrix[word_index] for word_index in encoded_sequence] for encoded_sequence in padded_sequences])
     history = autoencoder.fit(padded_sequences, expected_autoencoder_output, epochs=50, verbose=1)
-    autoencoder.save('models/autoencoder_trained')
+    autoencoder.save("models/autoencoder_trained")
     plot_history(history)
