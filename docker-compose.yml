@@ -16,6 +16,7 @@ services:
     ports:
       - 8888:8888
     user: root
+    tty: true
     environment:
       NB_USER: user_name
       NB_UID: 1008
