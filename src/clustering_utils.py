@@ -32,6 +32,11 @@ class ClusteringLayer(Layer):
         assert input_shape and len(input_shape) == 2
         return input_shape[0], self.n_clusters
 
+    def get_config(self):
+        config = {'n_clusters': self.n_clusters}
+        base_config = super(ClusteringLayer, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))
+
 
 def get_init_kmeans_cluster_centers(n_clusters, latent_features):
     kmeans = KMeans(n_clusters=n_clusters, n_init=20, n_jobs=4)
