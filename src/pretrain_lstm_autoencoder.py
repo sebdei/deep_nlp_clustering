@@ -7,7 +7,7 @@ import preprocess
 import text_provider
 
 LAST_ENCODER_LAYER_KEY = "last_encoder_layer"
-MODEL_PATH = "./models/autoencoder_trained.h5"
+MODEL_PATH = "./models/autoencoder_trained_mse.h5"
 
 
 def plot_history(history):
@@ -16,7 +16,7 @@ def plot_history(history):
     plt.ylabel("Accuracy")
     plt.xlabel("Epoch")
     plt.show()
-    plt.savefig("visualization/history.png")
+    plt.savefig("visualization/history_mse.png")
 
 
 def define_lstm_autoencoder_layers(embedding_matrix, vocab_size, feature_dimension_size, max_sequence_length):
@@ -34,7 +34,7 @@ def define_lstm_autoencoder_layers(embedding_matrix, vocab_size, feature_dimensi
     autoencoder.add(LSTM(64, return_sequences=True))
     autoencoder.add(TimeDistributed(Dense(feature_dimension_size)))
 
-    autoencoder.compile(optimizer="adam", loss="mean_absolute_error",  metrics=["accuracy"])
+    autoencoder.compile(optimizer="adam", loss="mse",  metrics=["accuracy"])
     autoencoder.summary()
 
     return autoencoder
@@ -43,6 +43,8 @@ def define_lstm_autoencoder_layers(embedding_matrix, vocab_size, feature_dimensi
 def pretrain_lstm_autoencoder():
     df = text_provider.provide_bbc_sequence_list()
     embedding_matrix, padded_sequences = preprocess.preprocess_word_embedding(df.text)
+
+    padded_sequences = padded_sequences[0:2000]
 
     vocab_size = len(embedding_matrix)
     feature_dimension_size = len(embedding_matrix[0])
@@ -56,6 +58,6 @@ def pretrain_lstm_autoencoder():
         )
 
     expected_autoencoder_output = np.array([[embedding_matrix[word_index] for word_index in encoded_sequence] for encoded_sequence in padded_sequences])
-    history = autoencoder.fit(padded_sequences, expected_autoencoder_output, epochs=50, verbose=1)
-    autoencoder.save("models/autoencoder_trained")
+    history = autoencoder.fit(padded_sequences, expected_autoencoder_output, epochs=75, verbose=1)
+    autoencoder.save(MODEL_PATH)
     plot_history(history)
