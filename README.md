@@ -1,4 +1,4 @@
-Deep NLP Clustering implementation with an **LSTM**-Autoencoder
+Deep NLP Clustering implementation with an LSTM-Autoencoder
 ===============
 Groundwork by [Xie et. al](https://arxiv.org/abs/1511.06335)
 
