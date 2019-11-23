@@ -9,3 +9,4 @@ models/glove.6B.zip
 
 *.ipynb
 *.h5
+*.gz
