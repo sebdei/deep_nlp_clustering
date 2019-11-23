@@ -20,7 +20,7 @@ GPU
 Build Tensorflow Docker 
 --------
 ```
-docker build -t sebdei/tensorflow-gpu ./tensorflow
+docker build -t sebdei/tensorflow-gpu ./gpu
 ```
 
 Run Docker with mounted volumes
