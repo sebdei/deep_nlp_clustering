@@ -55,3 +55,5 @@ for i in range(int(max_iterations)):
     loss = encoder_cluster_model.train_on_batch(x=padded_sequences[idx], y=target_distribution[idx])
     losses.append(loss)
     batch_index = batch_index + 1 if (batch_index + 1) * batch_size <= padded_sequences.shape[0] else 0
+
+from sklearn.metrics import homogeneity_score
