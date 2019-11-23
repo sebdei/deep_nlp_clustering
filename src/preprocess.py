@@ -34,7 +34,6 @@ def preprocess_word_embedding(sequence_list):
     return (embedding_matrix, padded_sequences)
 
 
-model = provide_fasttext_model()
 def createFastTextMatrix(sentence):
     global model 
     #model = model_provider.provide_fasttext_model()
@@ -73,6 +72,7 @@ def preprocess_word_embedding_fasttext(sequence_list):
     padded_sequences = keras_pad_sequenecs(encoded_sequences, padding='post')
 
     return (embedding_matrix, padded_sequences)
+
 
 def removeStopWords(text):
     en_stop = set(stopwords.words('english'))
