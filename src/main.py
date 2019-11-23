@@ -37,7 +37,7 @@ clusterings_result = pd.DataFrame({"clustering_init": cluster_assignments})
 
 # do Soft Assignment Hardening
 
-batch_size = 16  # test with batch_size = 32 ?
+batch_size = 16  # TODO: test with batch_size = 32 ?
 max_iterations = 2800
 update_interval = 140  # wrt to sequence_length e.g. 2225 / batch_size ?
 index_array = np.arange(len(df.index))
@@ -46,10 +46,11 @@ losses = []
 batch_index = 0
 for i in range(int(max_iterations)):
     print("Iteration: %1d / %1d" % (i, max_iterations))
-    similarity_scores = encoder_cluster_model.predict(padded_sequences, verbose=1)
     if i % update_interval == 0:
+        similarity_scores = encoder_cluster_model.predict(padded_sequences)
         target_distribution = clustering_utils.get_target_distribution(similarity_scores)
-    if i % 60 == 0:
+    if i % update_interval/2 == 0:
+        similarity_scores = encoder_cluster_model.predict(padded_sequences)
         clusterings_result["clustering_"+str(i)] = clustering_utils.get_cluster_assignments(similarity_scores)
         clusterings_result.to_csv("results/clustering_result.csv")
     idx = index_array[batch_index * batch_size: min((batch_index+1) * batch_size, padded_sequences.shape[0])]
