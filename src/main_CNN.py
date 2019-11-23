@@ -14,6 +14,8 @@ import matplotlib.pyplot as plt
 
 #os.chdir("/Volumes/Files/Onedrive/Masters/Study Materials/Third Semester/Seminar-Recent Trends in Deep Learning")
 #os.chdir("/Users/kevin/Downloads")
+#os.chdir("C:\\Users\\k_lim002\\Desktop\\Seminar")
+
 n_data = 1000
 
 matrix = pd.read_pickle("Word_Matrices.pkl")

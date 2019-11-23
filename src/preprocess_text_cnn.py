@@ -8,18 +8,19 @@ from preprocess import removeStopWords, createFastTextMatrix
 
 #os.chdir("/Volumes/Files/Onedrive/Masters/Study Materials/Third Semester/Seminar-Recent Trends in Deep Learning")
 #os.chdir("/Users/kevin/Downloads")
+#os.chdir("C:\\Users\\k_lim002\\Desktop\\Seminar")
 
 
 #Import dataset, data preprocessing
 dataset = pd.read_csv("Reviews.csv")
-dataset = dataset[['Score', 'Text']] 
-dataset['Text'] = dataset['Text'].apply(lambda x : re.sub(r'[^\w\s]',"",re.sub("[!.#$%^&*()]","", x)).lower())
-dataset['Text'] = dataset['Text'].apply(lambda x : removeStopWords(x))
+dataset = dataset[['reviews.rating', 'reviews.text']] 
+dataset['reviews.text'] = dataset['reviews.text'].apply(lambda x : re.sub(r'[^\w\s]',"",re.sub("[!.#$%^&*()]","", str(x))).lower())
+dataset['reviews.text'] = dataset['reviews.text'].apply(lambda x : removeStopWords(x))
 dataset.to_csv("clean.csv") #save the intermediate dataframe
 dataset = pd.read_csv("clean.csv") 
 
 #Get max words
-dataset['Text'].map(len).max() #1975 words
+dataset['reviews.text'].map(len).max() #883 words
 
 
 matrix =  pd.DataFrame(columns=['Rating', 'CleanedText', 'SentenceMatrix'])
