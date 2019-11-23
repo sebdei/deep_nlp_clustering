@@ -2,6 +2,8 @@ Deep NLP Clustering implementation with an LSTM-Autoencoder
 ===============
 Groundwork by [Xie et. al](https://arxiv.org/abs/1511.06335)
 
+Pretrain an autoencoder, cut of the encoder part and use the latent features for clustering assignment hardening.
+
 Python Docker 
 ------------
 Start Python docker
