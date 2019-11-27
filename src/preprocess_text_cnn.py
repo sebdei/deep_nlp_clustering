@@ -26,7 +26,7 @@ dataset = pd.read_csv("clean.csv")
 dataset['reviews.text'].map(len).max() #883 words
 
 
-#Get length-- get length less than or equal to 365--
+#Get length--
 for i in range(len(dataset['reviews.text'])):
     dataset['length'][i] = len(dataset['reviews.text'][i])
 
@@ -48,13 +48,7 @@ for i in range(len(dataset)):
     print(i)
     matrix = matrix.append({'Rating': dataset.iloc[i,1], 'CleanedText': dataset.iloc[i,2],'WordMatrix':createFastTextMatrix(dataset.iloc[i,2])}, ignore_index=True)
 
-matrix.to_pickle("Word_Matrices_small.pkl")
+matrix.to_pickle("Word_Matrices_60.pkl")
 
-#Preprocessing of data for PCA and LSA
-matrix = np.array([])
-
-for i in range(len(dataset)):
-    print(i)
-    matrix = np.append(matrix, createFastTextArray(dataset.iloc[i,2]))
 
 

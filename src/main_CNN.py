@@ -19,10 +19,10 @@ from sklearn.model_selection import StratifiedShuffleSplit
 
 
 
-source = pd.read_pickle("Word_Matrices_small.pkl")
+source = pd.read_pickle("Word_Matrices_60.pkl")
 n_data = len(source)
 
-matrix = recreate_input_matrix_2d(source, 3,n_data, 30, 300)
+matrix = recreate_input_matrix_2d(source, 3,n_data, 60, 300)
 rating = source['Rating'].values
 
 stratSplit = StratifiedShuffleSplit(n_splits=5,test_size=0.4, random_state=42)
@@ -31,7 +31,7 @@ for train_index, test_index in stratSplit.split(matrix, rating):
     X_train, X_test = matrix[train_index], matrix[test_index]
     y_train, y_test = rating[train_index], rating[test_index]
 
-autoencoder, encoder  = CNN_autoencoder_2D(X_train, (2,2), (10,100))
+autoencoder, encoder  = CNN_autoencoder_2D(X_train, (2,2), (20,100))
 
 
 n_clusters = 5

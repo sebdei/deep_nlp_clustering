@@ -15,11 +15,7 @@ def recreate_input_matrix(dataframe, index, batch, dimensions, channel):
     return x_train
 
 def recreate_input_matrix_2d(dataframe, index, batch, dimensions, channel):
-    x_train = np.array([])
-    for i in range(len(dataframe)):
-        x_train = np.append( x_train, dataframe.iloc[i,index])
-        print(i)
-    
+    x_train = np.array([dataframe.iloc[i,index] for i in range(len(dataframe))]) 
     x_train = x_train.reshape((batch, dimensions, channel,1))
     return x_train
 

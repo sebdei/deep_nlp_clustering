@@ -38,8 +38,8 @@ def createFastTextMatrix(sentence):
     #model = model_provider.provide_fasttext_model()
     value = eval(sentence)
     print(len(value))
-    embedding_matrix = np.zeros((30, 300))
-    ran = min(30,len(value) )
+    embedding_matrix = np.zeros((60, 300))
+    ran = min(60,len(value) )
     for index in range(ran):
         embedding_matrix[index] = model.wv.get_vector(value[index])
     return embedding_matrix
