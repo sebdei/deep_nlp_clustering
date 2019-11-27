@@ -35,14 +35,26 @@ def preprocess_word_embedding(sequence_list):
 
 
 def createFastTextMatrix(sentence):
-    global model 
     #model = model_provider.provide_fasttext_model()
     value = eval(sentence)
     print(len(value))
-    embedding_matrix = np.zeros((900, 300))
-    for index in range(len(value)):
+    embedding_matrix = np.zeros((30, 300))
+    ran = min(30,len(value) )
+    for index in range(ran):
         embedding_matrix[index] = model.wv.get_vector(value[index])
     return embedding_matrix
+
+def createFastTextArray(sentence):
+    #model = model_provider.provide_fasttext_model()
+    value = eval(sentence)
+    print(len(value))
+    embedding_array = np.array([])
+    for index in range(300):
+        try:
+            embedding_array= np.append(embedding_array, model.wv.get_vector(value[index])) 
+        except:
+            embedding_array= np.append(embedding_array, np.zeros(300)) 
+    return embedding_array
 
 
 def build_embedding_matrix_fasttext(word_index_dict, vocab_size, feature_dimension_size, model):

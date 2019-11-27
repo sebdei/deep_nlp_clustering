@@ -18,6 +18,7 @@ def recreate_input_matrix_2d(dataframe, index, batch, dimensions, channel):
     x_train = np.array([])
     for i in range(len(dataframe)):
         x_train = np.append( x_train, dataframe.iloc[i,index])
+        print(i)
     
     x_train = x_train.reshape((batch, dimensions, channel,1))
     return x_train
@@ -46,7 +47,7 @@ def CNN_autoencoder(x_train, filter_size, pool_size):
     model.add(Conv1D(16,filter_size, padding='same', activation='relu'))
     model.add(UpSampling1D(pool_size))
     
-    model.add(Conv1D(300,filter_size, padding='same', activation='sigmoid'))
+    model.add(Conv1D(299,filter_size, padding='same', activation='sigmoid'))
     model.summary()
     
     model.compile(optimizer='adadelta', loss='binary_crossentropy')
@@ -61,13 +62,13 @@ def CNN_autoencoder_2D(x_train, filter_size, pool_size):
     model = Sequential()
     
     #Encoder Part
-    model.add(Conv2D(16, filter_size, padding='valid', input_shape=(len(x_train[0]), len(x_train[0][0]),1), name='input', data_format="channels_last", activation='relu'))
+    model.add(Conv2D(16, filter_size, padding='same', input_shape=(len(x_train[0]), len(x_train[0][0]),1), name='input', data_format="channels_last", activation='relu'))
     model.add(Conv2D(8,filter_size, padding='valid', activation='relu')) 
-    model.add(Conv2D(4,filter_size, padding='valid', activation='relu')) 
+    model.add(Conv2D(4,filter_size, padding='valid', activation='relu'))
     #model.add(MaxPooling2D(pool_size=(24,300), padding='same'))
     model.add(Flatten())
     model.add(Dense(3 , name='bottleneck'))
-
+    
     #Unflatten 
     model.add(Reshape((1, 1, 3)))
    
@@ -79,7 +80,7 @@ def CNN_autoencoder_2D(x_train, filter_size, pool_size):
     model.summary()
     
     model.compile(optimizer='adadelta', loss='mse')
-    model.fit(x_train, x_train, epochs=10)
+    model.fit(x_train, x_train, epochs=5)
     bottleneck = model.get_layer('bottleneck')
     encoder = Model(input=model.input, output=bottleneck.output)
     
