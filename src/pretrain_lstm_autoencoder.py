@@ -61,7 +61,7 @@ def pretrain_lstm_autoencoder(latent_feature_dimensions=32):
     )
 
     expected_autoencoder_output = np.array([[embedding_matrix[word_index] for word_index in encoded_sequence] for encoded_sequence in padded_sequences])
-    history = autoencoder.fit(padded_sequences, expected_autoencoder_output, epochs=2, verbose=1)
+    history = autoencoder.fit(padded_sequences, expected_autoencoder_output, epochs=75, verbose=2)
     autoencoder.save(MODEL_PATH + MODEL_BASE_NAME + str(latent_feature_dimensions*2) + "-" + str(latent_feature_dimensions) + ".h5")
     np.save(MODEL_PATH + MODEL_BASE_NAME + str(latent_feature_dimensions*2) + "-" + str(latent_feature_dimensions), history)
     plot_history(history, name=str(latent_feature_dimensions*2) + "-" + str(latent_feature_dimensions))
