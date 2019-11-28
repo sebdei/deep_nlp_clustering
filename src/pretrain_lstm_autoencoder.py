@@ -55,7 +55,7 @@ def pretrain_lstm_autoencoder():
         vocab_size=vocab_size,
         feature_dimension_size=feature_dimension_size,
         max_sequence_length=max_sequence_length,
-        )
+    )
 
     expected_autoencoder_output = np.array([[embedding_matrix[word_index] for word_index in encoded_sequence] for encoded_sequence in padded_sequences])
     history = autoencoder.fit(padded_sequences, expected_autoencoder_output, epochs=75, verbose=1)
