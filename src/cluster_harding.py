@@ -27,7 +27,7 @@ init_cluster_centers = clustering_utils.get_init_kmeans_cluster_centers(NUM_CLUS
 
 clustering_layer = clustering_utils.ClusteringLayer(NUM_CLUSTERS, weights=[init_cluster_centers], name="clustering")(encoder.output)
 encoder_cluster_model = Model(inputs=encoder.input, outputs=clustering_layer)
-encoder_cluster_model.compile(optimizer=SGD(0.01, 0.9), loss="kld")  # Kullback-leibner divergence loss
+encoder_cluster_model.compile(optimizer='adam', loss="kld")  # Kullback-leibner divergence loss
 
 similarity_scores = encoder_cluster_model.predict(padded_sequences, verbose=0)
 cluster_assignments = clustering_utils.get_cluster_assignments(similarity_scores)
