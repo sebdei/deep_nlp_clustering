@@ -46,7 +46,7 @@ def pretrain_lstm_autoencoder(latent_feature_dimensions=32):
     embedding_matrix, padded_sequences = preprocess.preprocess_word_embedding(df.text)
 
     #  better shuffle?
-    padded_sequences = padded_sequences[0:20]
+    padded_sequences = padded_sequences[0:2000]
 
     vocab_size = len(embedding_matrix)
     feature_dimension_size = len(embedding_matrix[0])
