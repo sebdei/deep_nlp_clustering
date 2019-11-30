@@ -16,11 +16,12 @@ def provide_sequence_list(amount=-1):
 
 def provide_bbc_sequence_list():
     data = load_files("./data/bbc/", encoding="utf-8", decode_error="replace")
-    text = np.array([re.sub(r'[^\w\s\n]',"",re.sub("[!.#$%^&*()]","", str(x))).lower().replace('\n','').replace('\\','') for x in data['data']]).reshape(len(data['data']),1)
+    text = np.array([re.sub(r'[^\w\s\n]', "", re.sub("[!.#$%^&*()]", "", str(x))).lower().replace('\n', '').replace('\\', '') for x in data['data']]).reshape(len(data['data']), 1)
     label = data['target']
-    stratSplit = StratifiedShuffleSplit(n_splits=5,test_size=0.4, random_state=42)
+    stratSplit = StratifiedShuffleSplit(n_splits=5, test_size=0.4, random_state=42)
     for train_index, test_index in stratSplit.split(text, label):
         X_train, X_test = text[train_index], text[test_index]
         y_train, y_test = label[train_index], label[test_index]
-    
-    return X_train, X_test, y_train, y_test 
+
+    return X_train, X_test, y_train, y_test
+
