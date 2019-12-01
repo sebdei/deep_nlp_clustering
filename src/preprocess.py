@@ -41,7 +41,7 @@ def createFastTextMatrix(sentence, number):
     embedding_matrix = np.zeros((number, 300))
     ran = min(number,len(value) )
     for index in range(ran):
-        embedding_matrix[index] = model.wv.get_vector(value[index])
+        embedding_matrix[index] = model.get_vector(value[index])
     return embedding_matrix
 
 def createFastTextArray(sentence):
@@ -51,7 +51,7 @@ def createFastTextArray(sentence):
     embedding_array = np.array([])
     for index in range(300):
         try:
-            embedding_array= np.append(embedding_array, model.wv.get_vector(value[index])) 
+            embedding_array= np.append(embedding_array, model.get_vector(value[index])) 
         except:
             embedding_array= np.append(embedding_array, np.zeros(300)) 
     return embedding_array
