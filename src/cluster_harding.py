@@ -10,7 +10,7 @@ import text_provider
 import pretrain_lstm_autoencoder
 
 df = text_provider.provide_bbc_sequence_list()
-embedding_matrix, padded_sequences = preprocess.preprocess_word_embedding(df.text)
+embedding_matrix, padded_sequences = preprocess.preprocess_word_embedding_fasttext(df.text)
 
 # prevents memory issues on GPU
 gpus = tf.config.experimental.list_physical_devices("GPU")

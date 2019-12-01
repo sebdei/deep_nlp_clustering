@@ -42,11 +42,8 @@ def define_lstm_autoencoder_layers(embedding_matrix, vocab_size, feature_dimensi
 
 
 def pretrain_lstm_autoencoder(latent_feature_dimensions=32):
-    df = text_provider.provide_bbc_sequence_list()
-    embedding_matrix, padded_sequences = preprocess.preprocess_word_embedding(df.text)
-
-    #  better shuffle?
-    padded_sequences = padded_sequences[0:2000]
+    x_train, x_text, y_train, y_text = text_provider.provide_bbc_sequence_list()
+    embedding_matrix, padded_sequences = preprocess.preprocess_word_embedding_fasttext(x_train)
 
     vocab_size = len(embedding_matrix)
     feature_dimension_size = len(embedding_matrix[0])
@@ -61,7 +58,7 @@ def pretrain_lstm_autoencoder(latent_feature_dimensions=32):
     )
 
     expected_autoencoder_output = np.array([[embedding_matrix[word_index] for word_index in encoded_sequence] for encoded_sequence in padded_sequences])
-    history = autoencoder.fit(padded_sequences, expected_autoencoder_output, epochs=75, verbose=2)
+    history = autoencoder.fit(padded_sequences, expected_autoencoder_output, epochs=40, verbose=2)
     autoencoder.save(MODEL_PATH + MODEL_BASE_NAME + str(latent_feature_dimensions*2) + "-" + str(latent_feature_dimensions) + ".h5")
     np.save(MODEL_PATH + MODEL_BASE_NAME + str(latent_feature_dimensions*2) + "-" + str(latent_feature_dimensions), history)
     plot_history(history, name=str(latent_feature_dimensions*2) + "-" + str(latent_feature_dimensions))

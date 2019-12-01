@@ -23,5 +23,10 @@ def provide_bbc_sequence_list():
         X_train, X_test = text[train_index], text[test_index]
         y_train, y_test = label[train_index], label[test_index]
 
-    return X_train, X_test, y_train, y_test
+    return X_train.flatten(), X_test.flatten(), y_train.flatten(), y_test.flatten()
+    # train_df = pd.DataFrame(data={'x_train': X_train, 'y_train': y_train})
+    # test_df = pd.DataFrame(data={'x_test': X_test, 'y_test': y_test})
 
+    # return train_df, test_df
+
+    # return pd.DataFrame(data={'x_train': X_train, 'x_text': X_test, 'y_train': y_train, 'y_test': y_test})
