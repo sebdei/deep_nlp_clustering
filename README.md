@@ -19,7 +19,7 @@ Run Docker with mounted volumes
 
 ```
 docker run --gpus all -it  \
---volume [absolute-path]/src:/src \
+--volume ${PWD}/src:/src \
 sebdei/tensorflow-gpu:latest
 ```
 
