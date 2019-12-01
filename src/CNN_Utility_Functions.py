@@ -63,10 +63,10 @@ def CNN_autoencoder_2D(x_train, filter_size, pool_size):
     model.add(Conv2D(4,filter_size, padding='valid', activation='relu'))
     #model.add(MaxPooling2D(pool_size=(24,300), padding='same'))
     model.add(Flatten())
-    model.add(Dense(3 , name='bottleneck'))
+    model.add(Dense(5 , name='bottleneck'))
     
     #Unflatten 
-    model.add(Reshape((1, 1, 3)))
+    model.add(Reshape((1, 1, 5)))
    
     #Decoder Part
     model.add(Conv2DTranspose(2, (3,3), padding='valid', activation='relu')) 

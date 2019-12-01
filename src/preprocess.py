@@ -34,12 +34,12 @@ def preprocess_word_embedding(sequence_list):
     return (embedding_matrix, padded_sequences)
 
 
-def createFastTextMatrix(sentence):
+def createFastTextMatrix(sentence, number):
     #model = model_provider.provide_fasttext_model()
     value = eval(sentence)
     print(len(value))
-    embedding_matrix = np.zeros((60, 300))
-    ran = min(60,len(value) )
+    embedding_matrix = np.zeros((number, 300))
+    ran = min(number,len(value) )
     for index in range(ran):
         embedding_matrix[index] = model.wv.get_vector(value[index])
     return embedding_matrix

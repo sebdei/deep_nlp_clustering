@@ -5,6 +5,7 @@ from urllib.request import urlretrieve
 import gensim
 import gzip
 import shutil
+import gensim.models.fasttext
 
 GLOVE_MODEL_BASE_DIR = 'models'
 GLOVE_MODEL_TXT_NAME = 'glove.6B.200d.txt'
@@ -15,6 +16,13 @@ FASTTEXT_MODEL_BASE_DIR = 'FastTextModel'
 FASTTEXT_MODEL_BIN_NAME = 'cc.en.300.bin'
 FASTTEXT_MODEL_ZIP_NAME = 'cc.en.300.bin.gz'
 FASTTEXT_MODEL_URL = 'https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.en.300.bin.gz'
+
+
+FASTTEXT_PRETRAINED_MODEL_BASE_DIR = 'FastTextPreModel'
+FASTTEXT_PRETRAINED_MODEL_TXT_NAME = 'crawl-300d-2M.vec'
+FASTTEXT_PRETRAINED_MODEL_ZIP_NAME = 'crawl-300d-2M.vec.zip'
+FASTTEXT_PRETRAINED_MODEL_URL = 'https://dl.fbaipublicfiles.com/fasttext/vectors-wiki/wiki.en.vec'
+
 
 
 def assure_glove_model_exists():
@@ -69,3 +77,5 @@ def provide_fasttext_model():
     model = gensim.models.fasttext.load_facebook_model(os.path.join(FASTTEXT_MODEL_BASE_DIR, FASTTEXT_MODEL_BIN_NAME))
 
     return model
+
+

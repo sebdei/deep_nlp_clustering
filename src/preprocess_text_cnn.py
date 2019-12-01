@@ -7,6 +7,8 @@ import numpy as np
 from preprocess import removeStopWords, createFastTextMatrix
 from collections import Counter
 import matplotlib.pyplot as plt
+from text_provider.py import provide_bbc_sequence_list
+from model_provider import provide_fasttext_model
 
 
 #os.chdir("/Volumes/Files/Onedrive/Masters/Study Materials/Third Semester/Seminar-Recent Trends in Deep Learning")
@@ -14,21 +16,25 @@ import matplotlib.pyplot as plt
 #os.chdir("C:\\Users\\k_lim002\\Desktop\\Seminar")
 
 
-#Import dataset, data preprocessing
+#Import dataset, data preprocessing for amazon
 dataset = pd.read_csv("Reviews.csv")
 dataset = dataset[['reviews.rating', 'reviews.text']] 
 dataset['reviews.text'] = dataset['reviews.text'].apply(lambda x : re.sub(r'[^\w\s\n]',"",re.sub("[!.#$%^&*()]","", str(x))).lower())
 dataset['reviews.text'] = dataset['reviews.text'].apply(lambda x : removeStopWords(x))
-dataset.to_csv("clean.csv") #save the intermediate dataframe
-dataset = pd.read_csv("clean.csv") 
+dataset.to_csv("amazon.csv") #save the intermediate dataframe
+dataset = pd.read_csv("amazon.csv") 
 
-#Get max words
-dataset['reviews.text'].map(len).max() #883 words
+#Import dataset, data preprocessing for BBC
+dataset= provide_bbc_sequence_list()
+dataset['text'] = dataset['text'].apply(lambda x : re.sub(r'[^\w\s\n]',"",re.sub("[!.#$%^&*()]","", str(x))).lower().replace('\n','').replace('\\',''))
+dataset['text'] = dataset['text'].apply(lambda x : removeStopWords(x))
+dataset.to_csv("bbc.csv") #save the intermediate dataframe
+dataset = pd.read_csv("bbc.csv") 
 
 
 #Get length--
-for i in range(len(dataset['reviews.text'])):
-    dataset['length'][i] = len(dataset['reviews.text'][i])
+lengths= np.array([len(dataset['text'][i]) for i in range(len(dataset['text']))])
+#BBC Max Length 23142
 
 length_counts = Counter(dataset['length'])
 df = pd.DataFrame.from_dict(length_counts, orient='index')
@@ -42,13 +48,14 @@ plt.show()
 
 model= provide_fasttext_model()
 
+dimension=23142
 matrix =  pd.DataFrame(columns=['Rating', 'CleanedText', 'SentenceMatrix'])
 for i in range(len(dataset)):
     print("index") 
     print(i)
-    matrix = matrix.append({'Rating': dataset.iloc[i,1], 'CleanedText': dataset.iloc[i,2],'WordMatrix':createFastTextMatrix(dataset.iloc[i,2])}, ignore_index=True)
+    matrix = matrix.append({'Rating': dataset.iloc[i,2], 'WordMatrix':createFastTextMatrix(dataset.iloc[i,1],dimension)}, ignore_index=True)
 
-matrix.to_pickle("Word_Matrices_60.pkl")
+matrix.to_pickle("BBC_Word_Matrices_max.pkl")
 
 
 

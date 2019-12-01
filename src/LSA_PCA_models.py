@@ -11,6 +11,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 #os.chdir("C:\\Users\\k_lim002\\Desktop\\Seminar")
 
+
 # Execute this for Word embedding
 matrix = pd.read_pickle("Word_Matrices_60.pkl")
 
@@ -20,21 +21,21 @@ Labels = matrix['Rating'].values
 
 
 #Execute this if TF-IDF
-dataset = pd.read_csv("clean.csv") 
+dataset = pd.read_csv("bbc.csv") 
 v = TfidfVectorizer()
-Flatten_Data = v.fit_transform(dataset['reviews.text']).toarray()
-Labels = dataset['reviews.rating'].values
-
+Flatten_Data = v.fit_transform(dataset['text']).toarray()
+Labels = dataset['label'].values
 
 #Check number of components
+maxcomponent=1000
 explained_var = []
-for components in range (1 ,100 ,5) :
+for components in range (1 ,maxcomponent ,5) :
     pca = PCA( n_components=components )
     pca.fit (Flatten_Data)
     explained_var.append(pca.explained_variance_ratio_.sum())
 
 #Plot the explained variance
-plt.plot(range(1,100,5),explained_var ,"ro") 
+plt.plot(range(1,maxcomponent,5),explained_var ,"ro") 
 plt.xlabel ("Number of Components")
 plt.ylabel ("Proportion of Explained Variance")
 plt.show()
@@ -46,22 +47,26 @@ for train_index, test_index in stratSplit.split(Flatten_Data, Labels):
     X_train, X_test = Flatten_Data[train_index], Flatten_Data[test_index]
     y_train, y_test = Labels[train_index], Labels[test_index]
 
+#Raw Kmeans
+model = KMeans(n_clusters=5,max_iter=100) 
+clustered = model.fit(X_train)
+labels_pred = model.predict(X_test)
+metrics.fowlkes_mallows_score(y_test, labels_pred) 
 
 #Chose 80 components 
-pca_train = PCA( n_components=80)
+pca_train = PCA( n_components=1000)
 pca_train.fit(X_train)
 pca_test = pca.transform(X_test)
 pca_train = pca.transform(X_train)
 
 
-#Clusters based on stars
+#Clusters based on stars for PCA
 model = KMeans(n_clusters=5,max_iter=100) 
 clustered = model.fit(pca_train)
 labels_pred = model.predict(pca_test)
 
-#Point of comparison
-metrics.fowlkes_mallows_score(y_test, labels_pred)  #Word- 0.5022791805622533 TF-IDF- 0.40625127300876157
-metrics.homogeneity_score(y_test, labels_pred)  #Word-0.02700449254956974 TF-IDF-0.03110447860595655
+metrics.fowlkes_mallows_score(y_test, labels_pred)  
+metrics.homogeneity_score(y_test, labels_pred)  
 
 
 #LSA

@@ -6,12 +6,14 @@ import matplotlib.pyplot as plt, numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 from keras.utils import plot_model
 from CNN_Utility_Functions import CNN_autoencoder_2D,recreate_input_matrix_2d, target_distribution
-from clustering import ClusteringLayer
+from clustering_utils import ClusteringLayer
 import keras.backend as K
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 from sklearn import metrics
 from sklearn.model_selection import StratifiedShuffleSplit
+from keras.engine.training import Model
+from keras.models import load_model
 
 #os.chdir("/Volumes/Files/Onedrive/Masters/Study Materials/Third Semester/Seminar-Recent Trends in Deep Learning")
 #os.chdir("/Users/kevin/Downloads")
@@ -19,10 +21,11 @@ from sklearn.model_selection import StratifiedShuffleSplit
 
 
 
-source = pd.read_pickle("Word_Matrices_60.pkl")
+source = pd.read_pickle("BBC_Word_Matrices_150.pkl")
 n_data = len(source)
+dimensions = 150
 
-matrix = recreate_input_matrix_2d(source, 3,n_data, 60, 300)
+matrix = recreate_input_matrix_2d(source, 3,n_data, dimensions, 300)
 rating = source['Rating'].values
 
 stratSplit = StratifiedShuffleSplit(n_splits=5,test_size=0.4, random_state=42)
@@ -31,8 +34,16 @@ for train_index, test_index in stratSplit.split(matrix, rating):
     X_train, X_test = matrix[train_index], matrix[test_index]
     y_train, y_test = rating[train_index], rating[test_index]
 
-autoencoder, encoder  = CNN_autoencoder_2D(X_train, (2,2), (20,100))
+autoencoder, encoder  = CNN_autoencoder_2D(X_train, (2,2), (50,100))
+autoencoder, encoder = CNN_autoencoder_2D(x_train, filter_size, pool_size, vocab_size,feature_dimension_size,max_sequence_length,embedding_matrix)
 
+'''
+autoencoder.save_weights("Autoencoder.h5")
+encoder.save_weights("encoder.h5")
+
+autoencoder = load_model("Autoencoder.h5")
+encoder = load_model("encoder.h5")
+'''
 
 n_clusters = 5
 maxiter = 5
@@ -50,6 +61,7 @@ y_pred = kmeans.fit_predict(encoder.predict(X_train))
 
 clustering_layer = ClusteringLayer(n_clusters,weights=[kmeans.cluster_centers_], name='clustering')(encoder.output)
 model = Model(inputs=autoencoder.input, outputs=[clustering_layer, autoencoder.output])
+#model.compile(loss=['kld', 'mse'], loss_weights=[1, 1], optimizer='adam')
 model.compile(loss=['kld', 'mse'], loss_weights=[1, 1], optimizer='adam')
 
 
@@ -58,7 +70,9 @@ plot_model(model, show_shapes=True, to_file='clustering.png')
 
 
 y_pred_last = np.copy(y_pred)
+
 for ite in range(int(maxiter)):
+    print(ite)
     if ite % update_interval == 0:
         q, _ = model.predict(X_train)
         p = target_distribution(q)  
@@ -83,13 +97,13 @@ for ite in range(int(maxiter)):
         index += 1
     ite += 1
 
-model.save_weights("model.h5")
+model.save_weights("model8.h5")
 
 y_pred,_ =  model.predict(X_test)
 y_pred=y_pred.argmax(1)
 
 
-metrics.fowlkes_mallows_score(y_test, y_pred)  #0.3652808738375953
-metrics.homogeneity_score(y_test, y_pred)  #0.019551600144295616
+metrics.fowlkes_mallows_score(y_test, y_pred)  
+metrics.homogeneity_score(y_test, y_pred) 
 
 
