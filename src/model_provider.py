@@ -41,7 +41,7 @@ def assure_glove_model_exists():
 def provide_glove_model():
     assure_glove_model_exists()
 
-    print('providing word embedding model ...')
+    print('providing glove model ...')
 
     file = open(os.path.join(GLOVE_MODEL_BASE_DIR, GLOVE_MODEL_TXT_NAME), 'r')
     model = {}
@@ -74,6 +74,9 @@ def assure_fasttext_model_exists():
 
 def provide_fasttext_model():
     assure_fasttext_model_exists()
+
+    print('providing fasttext model ...')
     model = FastText.load_fasttext_format(os.path.join(FASTTEXT_MODEL_BASE_DIR, FASTTEXT_MODEL_BIN_NAME))
+    print('succesfully provided fasttext model')
 
     return model.wv
