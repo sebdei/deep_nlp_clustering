@@ -1,5 +1,3 @@
 import pretrain_lstm_autoencoder
 
 pretrain_lstm_autoencoder.pretrain_lstm_autoencoder(32)
-pretrain_lstm_autoencoder.pretrain_lstm_autoencoder(64)
-pretrain_lstm_autoencoder.pretrain_lstm_autoencoder(128)

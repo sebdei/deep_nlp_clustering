@@ -9,14 +9,14 @@ import preprocess
 import text_provider
 import pretrain_lstm_autoencoder
 
-df = text_provider.provide_bbc_sequence_list()
-embedding_matrix, padded_sequences = preprocess.preprocess_word_embedding_fasttext(df.text)
+X_train, X_test, y_train, y_test = text_provider.provide_bbc_sequence_list()
+embedding_matrix, padded_sequences = preprocess.preprocess_word_embedding_fasttext(X_train)
 
 # prevents memory issues on GPU
 gpus = tf.config.experimental.list_physical_devices("GPU")
 tf.config.experimental.set_memory_growth(gpus[0], True)
 
-autoencoder = load_model(pretrain_lstm_autoencoder.MODEL_PATH)
+autoencoder = load_model(pretrain_lstm_autoencoder.MODEL_PATH + "/autoencoder_trained_128-64.h5")
 encoder_output = autoencoder.get_layer(pretrain_lstm_autoencoder.LAST_ENCODER_LAYER_KEY).output
 encoder = Model(inputs=autoencoder.inputs, outputs=encoder_output)
 
@@ -29,9 +29,11 @@ clustering_layer = clustering_utils.ClusteringLayer(NUM_CLUSTERS, weights=[init_
 encoder_cluster_model = Model(inputs=encoder.input, outputs=clustering_layer)
 encoder_cluster_model.compile(optimizer='adam', loss="kld")  # Kullback-leibner divergence loss
 
-similarity_scores = encoder_cluster_model.predict(padded_sequences, verbose=0)
+similarity_scores = encoder_cluster_model.predict(padded_sequences, verbose=1, batch_size=128)
 cluster_assignments = clustering_utils.get_cluster_assignments(similarity_scores)
 
+from sklearn.metrics.cluster import fowlkes_mallows_score
+fowlkes_mallows_score(y_train, cluster_assignments)
 
 #  do Soft Assignment Hardening
 
@@ -55,5 +57,3 @@ for i in range(int(max_iterations)):
     loss = encoder_cluster_model.train_on_batch(x=padded_sequences[idx], y=target_distribution[idx])
     losses.append(loss)
     batch_index = batch_index + 1 if (batch_index + 1) * batch_size <= padded_sequences.shape[0] else 0
-
-from sklearn.metrics import homogeneity_score
