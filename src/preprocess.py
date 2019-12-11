@@ -4,6 +4,7 @@ from keras.preprocessing.text import Tokenizer
 from nltk.tokenize import word_tokenize 
 import nltk
 from nltk.corpus import stopwords
+from sklearn.model_selection import StratifiedShuffleSplit
 
 import model_provider
 
@@ -69,10 +70,9 @@ def build_embedding_matrix_fasttext(word_index_dict, vocab_size, feature_dimensi
     return result
 
 
-def preprocess_word_embedding_fasttext(sequence_list):
+def preprocess_word_embedding_fasttext(sequence_list, label):
     tokenizer = Tokenizer()
     tokenizer.fit_on_texts(sequence_list)
-
     word_index_dict = tokenizer.word_index
     vocab_size = len(word_index_dict) + 1
 
@@ -82,8 +82,13 @@ def preprocess_word_embedding_fasttext(sequence_list):
 
     encoded_sequences = tokenizer.texts_to_sequences(sequence_list)
     padded_sequences = keras_pad_sequenecs(encoded_sequences, padding='post')
+    
+    stratSplit = StratifiedShuffleSplit(n_splits=5, test_size=0.2, random_state=42)
+    for train_index, test_index in stratSplit.split(padded_sequences, label):
+        X_train, X_test = padded_sequences[train_index], padded_sequences[test_index]
+        y_train, y_test = label[train_index], label[test_index]
 
-    return (embedding_matrix, padded_sequences)
+    return (embedding_matrix,  X_train, X_test,y_train, y_test)
 
 
 def removeStopWords(text):
