@@ -43,7 +43,7 @@ def provide_glove_model():
 
     print('providing glove model ...')
 
-    file = open(os.path.join(GLOVE_MODEL_BASE_DIR, GLOVE_MODEL_TXT_NAME), 'r')
+    file = open(os.path.join(GLOVE_MODEL_BASE_DIR, GLOVE_MODEL_TXT_NAME), 'r+', encoding="utf-8")
     model = {}
 
     for line in file:

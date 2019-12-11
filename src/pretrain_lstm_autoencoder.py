@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from keras.layers import Dense, Embedding, LSTM, RepeatVector, TimeDistributed
 from keras.models import Sequential
 import tensorflow as tf
+from keras import optimizers
 
 import preprocess
 import text_provider
@@ -22,6 +23,7 @@ def plot_history(history, name=""):
 
 
 def define_lstm_autoencoder_layers(embedding_matrix, vocab_size, feature_dimension_size, max_sequence_length, latent_feature_dimensions=32):
+    gpus = tf.config.experimental.list_physical_devices("GPU")
     autoencoder = Sequential(name="LSTM-Autoencoder")
 
     # encoder layers
