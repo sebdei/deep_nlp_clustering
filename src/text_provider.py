@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from sklearn.datasets import load_files
 from sklearn.model_selection import StratifiedShuffleSplit
+import preprocess
 
 
 def provide_sequence_list(amount=-1):
@@ -15,7 +16,7 @@ def provide_sequence_list(amount=-1):
 
 def provide_bbc_sequence_list():
     data = load_files("./data/bbc/", encoding="utf-8", decode_error="replace")
-    data['data'] = np.array([removeStopWords(x) for x in data['data']])
+    data['data'] = np.array([preprocess.removeStopWords(x) for x in data['data']])
     
     text = np.array([re.sub(r'[^\w\s\n]', "", re.sub("[!.#$%^&*()]", "", str(x))).lower().replace('\n', '').replace('\\', '') for x in data['data']]).reshape(len(data['data']), 1)
     
@@ -27,6 +28,7 @@ def provide_amazon_sequence_list():
     reviews =pd.read_csv("./data/Reviews.csv")
     reviews = reviews[reviews['reviews.rating']>0]
     label = reviews['reviews.rating']
+    reviews['reviews.text'] = np.array([preprocess.removeStopWords(x) for x in reviews['reviews.text']])
     data = reviews['reviews.text']
 
-    return data, label
+    return data.flatten(), label

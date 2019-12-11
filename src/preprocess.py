@@ -5,6 +5,7 @@ from nltk.tokenize import word_tokenize
 import nltk
 from nltk.corpus import stopwords
 from sklearn.model_selection import StratifiedShuffleSplit
+import nltk
 
 import model_provider
 
@@ -92,6 +93,8 @@ def preprocess_word_embedding_fasttext(sequence_list, label):
 
 
 def removeStopWords(text):
+    nltk.download('stopwords')
+    nltk.download('punkt')
     en_stop = set(stopwords.words('english'))
     word_tokens = word_tokenize(text) 
     filtered_sentence = [w for w in word_tokens if not w in en_stop] 
