@@ -9,6 +9,8 @@ import nltk
 
 import model_provider
 
+nltk.download('stopwords')
+nltk.download('punkt')
 
 def build_embedding_matrix(word_index_dict, vocab_size, feature_dimension_size, model):
     result = np.zeros((vocab_size, feature_dimension_size))
@@ -93,8 +95,6 @@ def preprocess_word_embedding_fasttext(sequence_list, label):
 
 
 def removeStopWords(text):
-    nltk.download('stopwords')
-    nltk.download('punkt')
     en_stop = set(stopwords.words('english'))
     word_tokens = word_tokenize(text) 
     filtered_sentence = [w for w in word_tokens if not w in en_stop] 
