@@ -21,7 +21,7 @@ def plot_history(history, name=""):
     plt.savefig("visualization/history_" + name + ".png")
 
 
-def define_lstm_autoencoder_layers(embedding_matrix, vocab_size, feature_dimension_size, max_sequence_length, latent_feature_dimensions=32):
+def define_lstm_autoencoder_layers(embedding_matrix, vocab_size, feature_dimension_size, max_sequence_length, latent_feature_dimensions=32, loss="mse"):
     autoencoder = Sequential(name="LSTM-Autoencoder")
 
     # encoder layers
@@ -36,13 +36,13 @@ def define_lstm_autoencoder_layers(embedding_matrix, vocab_size, feature_dimensi
     autoencoder.add(LSTM(latent_feature_dimensions*2, return_sequences=True))
     autoencoder.add(TimeDistributed(Dense(feature_dimension_size)))
 
-    autoencoder.compile(optimizer="adam", loss="cosine_proximity",  metrics=["mse", "mae"])
+    autoencoder.compile(optimizer="adam", loss=loss,  metrics=["mse", "mae"])
     autoencoder.summary()
 
     return autoencoder
 
 
-def pretrain_lstm_autoencoder(latent_feature_dimensions=32):
+def pretrain_lstm_autoencoder(latent_feature_dimensions=32, loss="mse"):
     gpus = tf.config.experimental.list_physical_devices("GPU")
     tf.config.experimental.set_memory_growth(gpus[0], True)
 
@@ -58,11 +58,12 @@ def pretrain_lstm_autoencoder(latent_feature_dimensions=32):
         vocab_size=vocab_size,
         feature_dimension_size=feature_dimension_size,
         max_sequence_length=max_sequence_length,
-        latent_feature_dimensions=latent_feature_dimensions
+        latent_feature_dimensions=latent_feature_dimensions,
+        loss=loss
     )
 
     expected_autoencoder_output = np.array([[embedding_matrix[word_index] for word_index in encoded_sequence] for encoded_sequence in x_train])
     history = autoencoder.fit(x_train, expected_autoencoder_output, epochs=120, verbose=2)
-    autoencoder.save(MODEL_PATH + MODEL_BASE_NAME + str(latent_feature_dimensions*2) + "-" + str(latent_feature_dimensions) + ".h5")
+    autoencoder.save(MODEL_PATH + MODEL_BASE_NAME + str(latent_feature_dimensions*2) + "-" + str(latent_feature_dimensions) + "_" + loss + ".h5")
     np.save(MODEL_PATH + MODEL_BASE_NAME + str(latent_feature_dimensions*2) + "-" + str(latent_feature_dimensions), history)
     plot_history(history, name=str(latent_feature_dimensions*2) + "-" + str(latent_feature_dimensions))
