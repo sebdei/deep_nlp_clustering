@@ -1,5 +1,4 @@
 from keras.models import Model, load_model
-from keras.optimizers import SGD
 import pandas as pd
 import numpy as np
 import tensorflow as tf
@@ -10,7 +9,7 @@ import text_provider
 import pretrain_lstm_autoencoder
 
 text, label = text_provider.provide_bbc_sequence_list()
-embedding_matrix,  x_train, x_test, y_train, y_test = preprocess.preprocess_word_embedding_fasttext(text, label)
+embedding_matrix, x_train, x_test, y_train, y_test = preprocess.preprocess_word_embedding_fasttext(text, label)
 
 # prevents memory issues on GPU
 gpus = tf.config.experimental.list_physical_devices("GPU")
