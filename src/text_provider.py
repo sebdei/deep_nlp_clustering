@@ -5,6 +5,8 @@ import numpy as np
 from sklearn.datasets import load_files
 import preprocess
 import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
 
 nltk.download('stopwords')
 nltk.download('punkt')
@@ -20,7 +22,7 @@ def provide_sequence_list(amount=-1):
 
 def provide_bbc_sequence_list():
     data = load_files("./data/bbc/", encoding="utf-8", decode_error="replace")
-    data['data'] = np.array([preprocess.removeStopWords(x) for x in data['data']])
+    data['data'] = np.array([removeStopWords(x) for x in data['data']])
     text = np.array([re.sub(r'[^\w\s\n]', "", re.sub("[!.#$%^&*()]", "", str(x))).lower().replace('\n', '').replace('\\', '') for x in data['data']]).reshape(len(data['data']), 1)
     label = data['target']
 
@@ -36,3 +38,10 @@ def provide_amazon_sequence_list():
     data = reviews['reviews.text']
 
     return data, label
+
+
+def removeStopWords(text):
+    en_stop = set(stopwords.words('english'))
+    word_tokens = word_tokenize(text) 
+    filtered_sentence = [w for w in word_tokens if not w in en_stop]
+    return filtered_sentence
