@@ -25,10 +25,11 @@ def provide_bbc_sequence_list():
     return text.flatten(), label
 
 def provide_amazon_sequence_list():
-    reviews =pd.read_csv("./data/Reviews.csv")
+    reviews =pd.read_csv("/home/dobby/deep_nlp_clustering/src/data/Reviews.csv")
     reviews = reviews[reviews['reviews.rating']>0]
+    reviews['reviews.text'] = reviews['reviews.text'].apply(lambda x : re.sub(r'[^\w\s\n]',"",re.sub("[!.#$%^&*()]","", str(x))).lower())
+    reviews['reviews.text'] = reviews['reviews.text'].apply(lambda x : preprocess.removeStopWords(x))
     label = reviews['reviews.rating']
-    reviews['reviews.text'] = np.array([preprocess.removeStopWords(x) for x in reviews['reviews.text']])
     data = reviews['reviews.text']
 
-    return data.flatten(), label
+    return data, label
