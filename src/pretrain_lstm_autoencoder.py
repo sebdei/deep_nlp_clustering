@@ -36,7 +36,7 @@ def define_lstm_autoencoder_layers(embedding_matrix, vocab_size, feature_dimensi
     autoencoder.add(LSTM(latent_feature_dimensions*2, return_sequences=True))
     autoencoder.add(TimeDistributed(Dense(feature_dimension_size)))
 
-    autoencoder.compile(optimizer="adam", loss="cosine_",  metrics=["accuracy"])
+    autoencoder.compile(optimizer="adam", loss="cosine_proximity",  metrics=["mse", "mae"])
     autoencoder.summary()
 
     return autoencoder
