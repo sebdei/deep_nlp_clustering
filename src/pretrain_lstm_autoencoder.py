@@ -27,16 +27,16 @@ def define_lstm_autoencoder_layers(embedding_matrix, vocab_size, feature_dimensi
     # encoder layers
     autoencoder.add(Embedding(vocab_size, feature_dimension_size, input_length=max_sequence_length, mask_zero=True, trainable=False, weights=[embedding_matrix]))
     autoencoder.add(LSTM(latent_feature_dimensions*2, activation="relu", return_sequences=True, input_shape=(max_sequence_length, feature_dimension_size)))
-    autoencoder.add(LSTM(latent_feature_dimensions, return_sequences=False, name=LAST_ENCODER_LAYER_KEY))
+    autoencoder.add(LSTM(latent_feature_dimensions, activation="relu", return_sequences=False, name=LAST_ENCODER_LAYER_KEY))
 
     autoencoder.add(RepeatVector(max_sequence_length))  # Repeatvector for seq2seq lstm
 
     # decoder layers
     autoencoder.add(LSTM(latent_feature_dimensions, activation="relu", return_sequences=True))
-    autoencoder.add(LSTM(latent_feature_dimensions*2, return_sequences=True))
+    autoencoder.add(LSTM(latent_feature_dimensions*2, activation="relu", return_sequences=True))
     autoencoder.add(TimeDistributed(Dense(feature_dimension_size)))
 
-    autoencoder.compile(optimizer="adam", loss=loss,  metrics=["mse", "mae"])
+    autoencoder.compile(optimizer="adam", loss=loss,  metrics=["mse", "mae", "cosine_proximity"])
     autoencoder.summary()
 
     return autoencoder
