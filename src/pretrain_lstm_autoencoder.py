@@ -12,15 +12,6 @@ MODEL_BASE_NAME = "/autoencoder_trained_"
 MODEL_PATH = "./models"
 
 
-def plot_history(history, name=""):
-    plt.plot(history.history["accuracy"])
-    plt.title("Model accuracy " + name)
-    plt.ylabel("Accuracy")
-    plt.xlabel("Epoch")
-    plt.show()
-    plt.savefig("visualization/history_" + name + ".png")
-
-
 def define_lstm_autoencoder_layers(embedding_matrix, vocab_size, feature_dimension_size, max_sequence_length, latent_feature_dimensions=32, loss="mse"):
     autoencoder = Sequential(name="LSTM-Autoencoder")
 
@@ -66,4 +57,3 @@ def pretrain_lstm_autoencoder(latent_feature_dimensions=32, loss="mse"):
     history = autoencoder.fit(x_train, expected_autoencoder_output, epochs=75, verbose=1)
     autoencoder.save(MODEL_PATH + MODEL_BASE_NAME + str(latent_feature_dimensions*2) + "-" + str(latent_feature_dimensions) + "_" + loss + ".h5")
     np.save(MODEL_PATH + MODEL_BASE_NAME + str(latent_feature_dimensions*2) + "-" + str(latent_feature_dimensions), history)
-    plot_history(history, name=str(latent_feature_dimensions*2) + "-" + str(latent_feature_dimensions))
