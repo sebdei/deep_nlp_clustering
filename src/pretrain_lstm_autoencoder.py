@@ -53,7 +53,9 @@ def pretrain_lstm_autoencoder(latent_feature_dimensions=32, loss="mse"):
         loss=loss
     )
 
-    expected_autoencoder_output = np.array([[embedding_matrix[word_index] for word_index in encoded_sequence] for encoded_sequence in x_train])
-    history = autoencoder.fit(x_train, expected_autoencoder_output, epochs=75, verbose=1)
-    autoencoder.save(MODEL_PATH + MODEL_BASE_NAME + str(latent_feature_dimensions*2) + "-" + str(latent_feature_dimensions) + "_" + loss + ".h5")
-    np.save(MODEL_PATH + MODEL_BASE_NAME + str(latent_feature_dimensions*2) + "-" + str(latent_feature_dimensions), history)
+    try:
+        expected_autoencoder_output = np.array([[embedding_matrix[word_index] for word_index in encoded_sequence] for encoded_sequence in x_train])
+        history = autoencoder.fit(x_train, expected_autoencoder_output, epochs=75, verbose=1)
+    finally:
+        autoencoder.save(MODEL_PATH + MODEL_BASE_NAME + str(latent_feature_dimensions*2) + "-" + str(latent_feature_dimensions) + "_" + loss + ".h5")
+        np.save(MODEL_PATH + MODEL_BASE_NAME + str(latent_feature_dimensions*2) + "-" + str(latent_feature_dimensions), history)
