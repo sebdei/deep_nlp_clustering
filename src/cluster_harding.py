@@ -29,8 +29,6 @@ def do_cluster_hardening(model_file_name, dataset="bbc"):
     encoder_cluster_model = Model(inputs=encoder.input, outputs=clustering_layer)
     encoder_cluster_model.compile(optimizer='adam', loss="kld")  # Kullback-leibner divergence loss
 
-    #  do Soft Assignment Hardening
-
     batch_size = 16  # TODO: test with batch_size = 32 ?
     max_iterations = 2801
     update_interval = 140  # wrt to train size e.g. 2225 / batch_size ?
@@ -44,9 +42,9 @@ def do_cluster_hardening(model_file_name, dataset="bbc"):
             similarity_scores = encoder_cluster_model.predict(x_train)
             clusterings_result[str(i)] = clustering_utils.get_cluster_assignments(similarity_scores)
             target_distribution = clustering_utils.get_target_distribution(similarity_scores)
-            clusterings_result.to_csv("cluster_results/clustering_result" + + ".csv")
+            clusterings_result.to_csv("cluster_results/" + model_file_name + ".csv")
         idx = index_array[batch_index * batch_size: min((batch_index+1) * batch_size, x_train.shape[0])]
         encoder_cluster_model.train_on_batch(x=x_train[idx], y=target_distribution[idx])
         batch_index = batch_index + 1 if (batch_index + 1) * batch_size <= x_train.shape[0] else 0
 
-    encoder_cluster_model.save(pretrain_lstm_autoencoder.MODEL_PATH + "/finished_cluster_models/" + model_file_name + ".h5")
+    encoder_cluster_model.save(pretrain_lstm_autoencoder.MODEL_PATH + "/finished_cluster_models/" + model_file_name)
