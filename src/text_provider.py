@@ -12,12 +12,15 @@ nltk.download('stopwords')
 nltk.download('punkt')
 
 
-def provide_sequence_list(amount=-1):
-    with open('data/Reviews.csv') as csvfile:
-        readCSV = csv.reader(csvfile, delimiter=',')
-        sentence_list = [row[9] for row in readCSV]
+def provide_amazon_sequence_list():
+    reviews = pd.read_csv("/home/dobby/deep_nlp_clustering/src/data/Reviews.csv")
+    reviews = reviews[reviews['reviews.rating'] > 0]
+    reviews['reviews.text'] = reviews['reviews.text'].apply(lambda x: re.sub(r'[^\w\s\n]', "", re.sub("[!.#$%^&*()]", "", str(x))).lower())
+    reviews['reviews.text'] = reviews['reviews.text'].apply(lambda x: preprocess.removeStopWords(x))
+    label = reviews['reviews.rating']
+    data = reviews['reviews.text']
 
-    return sentence_list[:amount]
+    return data, label
 
 
 def provide_bbc_sequence_list():
@@ -29,15 +32,13 @@ def provide_bbc_sequence_list():
     return text.flatten(), label
 
 
-def provide_amazon_sequence_list():
-    reviews = pd.read_csv("/home/dobby/deep_nlp_clustering/src/data/Reviews.csv")
-    reviews = reviews[reviews['reviews.rating'] > 0]
-    reviews['reviews.text'] = reviews['reviews.text'].apply(lambda x: re.sub(r'[^\w\s\n]', "", re.sub("[!.#$%^&*()]", "", str(x))).lower())
-    reviews['reviews.text'] = reviews['reviews.text'].apply(lambda x: preprocess.removeStopWords(x))
-    label = reviews['reviews.rating']
-    data = reviews['reviews.text']
+def provide_sequence_list(dataset='bbc'):
+    if (dataset == 'bbc'):
+        text, label = provide_bbc_sequence_list()
+    elif (dataset == 'amazon_reviews'):
+        text, label = provide_amazon_sequence_list()
 
-    return data, label
+    return text, label
 
 
 def removeStopWords(text):
