@@ -39,7 +39,7 @@ class ClusteringLayer(Layer):
 
 
 def get_init_kmeans_cluster_centers(n_clusters, latent_features):
-    kmeans = KMeans(n_clusters=n_clusters, n_init=20, n_jobs=4)
+    kmeans = KMeans(n_clusters=n_clusters, n_jobs=4)
     kmeans.fit_predict(latent_features)
     return kmeans.cluster_centers_
 
