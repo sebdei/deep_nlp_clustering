@@ -21,7 +21,7 @@ encoder = Model(inputs=autoencoder.inputs, outputs=encoder_output)
 
 latent_features = encoder.predict(x_train)
 
-NUM_CLUSTERS = 5
+NUM_CLUSTERS = len(np.unique(label))
 init_cluster_centers = clustering_utils.get_init_kmeans_cluster_centers(NUM_CLUSTERS, latent_features)
 
 clustering_layer = clustering_utils.ClusteringLayer(NUM_CLUSTERS, weights=[init_cluster_centers], name="clustering")(encoder.output)
