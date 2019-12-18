@@ -39,7 +39,7 @@ def pretrain_lstm_autoencoder(dataset='bbc', latent_feature_dimensions=32, loss=
     if (dataset == 'bbc'):
         text, label = text_provider.provide_bbc_sequence_list()
     elif (dataset == 'amazon_reviews'):
-        text, label = text_provider.provide_bbc_sequence_list()
+        text, label = text_provider.provide_amazon_sequence_list()
 
     embedding_matrix, x_train, x_test, y_train, y_test = preprocess.preprocess_word_embedding_fasttext(text, label)
 
