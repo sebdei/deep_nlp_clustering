@@ -16,7 +16,7 @@ def provide_amazon_sequence_list():
     reviews = pd.read_csv("/home/dobby/deep_nlp_clustering/src/data/Reviews.csv")
     reviews = reviews[reviews['reviews.rating'] > 0]
     reviews['reviews.text'] = reviews['reviews.text'].apply(lambda x: re.sub(r'[^\w\s\n]', "", re.sub("[!.#$%^&*()]", "", str(x))).lower())
-    reviews['reviews.text'] = reviews['reviews.text'].apply(lambda x: preprocess.removeStopWords(x))
+    reviews['reviews.text'] = reviews['reviews.text'].apply(lambda x: removeStopWords(x))
     label = reviews['reviews.rating']
     data = reviews['reviews.text']
 
