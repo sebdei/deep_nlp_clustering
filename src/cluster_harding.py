@@ -30,19 +30,27 @@ def do_cluster_hardening(model_file_name, dataset="bbc"):
     encoder_cluster_model.compile(optimizer='adam', loss="kld")  # Kullback-leibner divergence loss
 
     batch_size = 16  # TODO: test with batch_size = 32 ?
-    max_iterations = 2801
-    update_interval = 140  # wrt to train size e.g. 2225 / batch_size ?
+    max_iterations = 2223
+    update_interval = 111  # wrt to train size e.g. 2225 / batch_size ?
     index_array = np.arange(len(x_train))
     batch_index = 0
 
-    clusterings_result = pd.DataFrame()
+    clusterings_result_train = pd.DataFrame()
+    clusterings_result_test = pd.DataFrame()
+
     for i in range(int(max_iterations)):
         print("Iteration: %1d / %1d" % (i, max_iterations))
         if i % update_interval == 0:
-            similarity_scores = encoder_cluster_model.predict(x_train)
-            clusterings_result[str(i)] = clustering_utils.get_cluster_assignments(similarity_scores)
-            target_distribution = clustering_utils.get_target_distribution(similarity_scores)
-            clusterings_result.to_csv("cluster_results/" + model_file_name + ".csv")
+            similarity_scores_train = encoder_cluster_model.predict(x_train)
+            target_distribution = clustering_utils.get_target_distribution(similarity_scores_train)
+
+            clusterings_result_train[str(i)] = clustering_utils.get_cluster_assignments(similarity_scores_train)
+            clusterings_result_train.to_csv("cluster_results/" + model_file_name + "_train.csv")
+
+            similarity_scores_test = encoder_cluster_model.predict(x_test)
+            clusterings_result_test[str(i)] = clustering_utils.get_cluster_assignments(similarity_scores_test)
+            clusterings_result_test.to_csv("cluster_results/" + model_file_name + "_test.csv")
+
         idx = index_array[batch_index * batch_size: min((batch_index+1) * batch_size, x_train.shape[0])]
         encoder_cluster_model.train_on_batch(x=x_train[idx], y=target_distribution[idx])
         batch_index = batch_index + 1 if (batch_index + 1) * batch_size <= x_train.shape[0] else 0
