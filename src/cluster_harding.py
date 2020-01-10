@@ -27,7 +27,9 @@ def do_cluster_hardening(model_file_name, dataset="bbc"):
 
     clustering_layer = clustering_utils.ClusteringLayer(NUM_CLUSTERS, weights=[init_cluster_centers], name="clustering")(encoder.output)
     encoder_cluster_model = Model(inputs=encoder.input, outputs=clustering_layer)
-    encoder_cluster_model.compile(optimizer='adam', loss="kld")  # Kullback-leibner divergence loss
+    encoder_cluster_model.compile(optimizer='adam', loss=['kld', 'cosine_proximity'], loss_weights=[0.1, 0.9])
+
+    expected_autoencoder_output = np.array([[embedding_matrix[word_index] for word_index in encoded_sequence] for encoded_sequence in x_train])
 
     batch_size = 16  # TODO: test with batch_size = 32 ?
     max_iterations = 2223
@@ -52,7 +54,7 @@ def do_cluster_hardening(model_file_name, dataset="bbc"):
             clusterings_result_test.to_csv("cluster_results/" + model_file_name + "_test.csv")
 
         idx = index_array[batch_index * batch_size: min((batch_index+1) * batch_size, x_train.shape[0])]
-        encoder_cluster_model.train_on_batch(x=x_train[idx], y=target_distribution[idx])
+        encoder_cluster_model.train_on_batch(x=x_train[idx], y=[target_distribution[idx], expected_autoencoder_output[idx]])
         batch_index = batch_index + 1 if (batch_index + 1) * batch_size <= x_train.shape[0] else 0
 
     encoder_cluster_model.save(pretrain_lstm_autoencoder.MODEL_PATH + "/finished_cluster_models/" + model_file_name)
