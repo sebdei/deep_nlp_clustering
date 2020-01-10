@@ -49,7 +49,7 @@ def do_cluster_hardening(model_file_name, dataset="bbc"):
             clusterings_result_train[str(i)] = clustering_utils.get_cluster_assignments(similarity_scores_train)
             clusterings_result_train.to_csv("cluster_results/" + model_file_name + "_train.csv")
 
-            similarity_scores_test = encoder_cluster_model.predict(x_test)
+            similarity_scores_test, _ = encoder_cluster_model.predict(x_test)
             clusterings_result_test[str(i)] = clustering_utils.get_cluster_assignments(similarity_scores_test)
             clusterings_result_test.to_csv("cluster_results/" + model_file_name + "_test.csv")
 
