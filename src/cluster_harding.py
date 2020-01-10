@@ -26,7 +26,7 @@ def do_cluster_hardening(model_file_name, dataset="bbc"):
     init_cluster_centers = clustering_utils.get_init_kmeans_cluster_centers(NUM_CLUSTERS, latent_features)
 
     clustering_layer = clustering_utils.ClusteringLayer(NUM_CLUSTERS, weights=[init_cluster_centers], name="clustering")(encoder.output)
-    encoder_cluster_model = Model(inputs=encoder.input, outputs=clustering_layer)
+    encoder_cluster_model = Model(inputs=encoder.input, outputs=[clustering_layer, autoencoder.output])
     encoder_cluster_model.compile(optimizer='adam', loss=['kld', 'cosine_proximity'], loss_weights=[0.1, 0.9])
 
     expected_autoencoder_output = np.array([[embedding_matrix[word_index] for word_index in encoded_sequence] for encoded_sequence in x_train])
@@ -43,7 +43,7 @@ def do_cluster_hardening(model_file_name, dataset="bbc"):
     for i in range(int(max_iterations)):
         print("Iteration: %1d / %1d" % (i, max_iterations))
         if i % update_interval == 0:
-            similarity_scores_train = encoder_cluster_model.predict(x_train)
+            similarity_scores_train, _ = encoder_cluster_model.predict(x_train)
             target_distribution = clustering_utils.get_target_distribution(similarity_scores_train)
 
             clusterings_result_train[str(i)] = clustering_utils.get_cluster_assignments(similarity_scores_train)
