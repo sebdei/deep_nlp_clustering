@@ -31,9 +31,10 @@ def do_cluster_hardening(model_file_name, dataset="bbc"):
 
     expected_autoencoder_output = np.array([[embedding_matrix[word_index] for word_index in encoded_sequence] for encoded_sequence in x_train])
 
-    batch_size = 16  # TODO: test with batch_size = 32 ?
+    # Hyperparams
+    batch_size = 16
     max_iterations = 2223
-    update_interval = 111  # wrt to train size e.g. 2225 / batch_size ?
+    update_interval = 111
     index_array = np.arange(len(x_train))
     batch_index = 0
 
