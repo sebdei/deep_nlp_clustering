@@ -1,83 +1,78 @@
 import numpy as np
-from keras.utils import plot_model
 import pandas as pd
 import os
 import matplotlib.pyplot as plt, numpy as np
-from mpl_toolkits.mplot3d import Axes3D
-from keras.utils import plot_model
-from CNN_Utility_Functions import CNN_autoencoder_2D,recreate_input_matrix_2d, target_distribution
-from clustering_utils import ClusteringLayer
-import keras.backend as K
 from sklearn.cluster import KMeans
-import matplotlib.pyplot as plt
 from sklearn import metrics
-from sklearn.model_selection import StratifiedShuffleSplit
-from keras.engine.training import Model
-from keras.models import load_model
-
-#os.chdir("/Volumes/Files/Onedrive/Masters/Study Materials/Third Semester/Seminar-Recent Trends in Deep Learning")
-#os.chdir("/Users/kevin/Downloads")
-#os.chdir("C:\\Users\\k_lim002\\Desktop\\Seminar")
-
-
-
-source = pd.read_pickle("BBC_Word_Matrices_150.pkl")
-n_data = len(source)
-dimensions = 150
-
-matrix = recreate_input_matrix_2d(source, 3,n_data, dimensions, 300)
-rating = source['Rating'].values
-
-stratSplit = StratifiedShuffleSplit(n_splits=5,test_size=0.4, random_state=42)
-for train_index, test_index in stratSplit.split(matrix, rating):
-    print("TRAIN:", train_index, "TEST:", test_index)
-    X_train, X_test = matrix[train_index], matrix[test_index]
-    y_train, y_test = rating[train_index], rating[test_index]
-
-autoencoder, encoder  = CNN_autoencoder_2D(X_train, (2,2), (50,100))
-autoencoder, encoder = CNN_autoencoder_2D(x_train, filter_size, pool_size, vocab_size,feature_dimension_size,max_sequence_length,embedding_matrix)
+import text_provider 
+import preprocess 
+import CNN_Utility_Functions
+import clustering_utils 
+from keras.models import Model
 
 '''
-autoencoder.save_weights("Autoencoder.h5")
-encoder.save_weights("encoder.h5")
-
-autoencoder = load_model("Autoencoder.h5")
-encoder = load_model("encoder.h5")
-'''
-
+#BBC Data
 n_clusters = 5
-maxiter = 5
-update_interval = 3
+maxiter = 1101
+update_interval = 55
 tol=1e-3
 index = 0
-batch_size = 200
+batch_size = 32
+dimensions = 300
 
-# Implementation  of Deep Clustering with Convolutional Autoencoders Xifeng Guo1, Xinwang Liu1, En Zhu1, and Jianping Yin2
+'''
 
-# Define DCEC model
+#Amazon Data
+n_clusters = 5
+maxiter = 3569
+update_interval = 179
+tol=1e-3
+index = 0
+batch_size = 32
+dimensions = 300
+
+
+#data, label = text_provider.provide_bbc_sequence_list()
+data, label = text_provider.provide_amazon_sequence_list()
+
+embedding_matrix, x_train, x_test,y_train, y_test = preprocess.preprocess_word_embedding_fasttext(data, label)
+
+vocab_size = len(embedding_matrix)
+feature_dimension_size = len(embedding_matrix[0])
+max_sequence_length = len( x_train[0])
+
+autoencoder, encoder  = CNN_Utility_Functions.CNN_autoencoder_2D_em(x_train, (300,4),vocab_size,feature_dimension_size,max_sequence_length,embedding_matrix, "BBC")
+#autoencoder, encoder  = CNN_Utility_Functions.CNN_autoencoder_2D_em(x_train, (300,4),vocab_size,feature_dimension_size,max_sequence_length,embedding_matrix, "Amazon")
+
+autoencoder.save_weights("auto_encoder.h5")
+encoder.save_weights("encoder.h5")
+
 kmeans = KMeans(n_clusters=n_clusters, n_init=20)
-y_pred = kmeans.fit_predict(encoder.predict(X_train))
+y_pred = kmeans.fit_predict(encoder.predict(x_train))
 
 
-clustering_layer = ClusteringLayer(n_clusters,weights=[kmeans.cluster_centers_], name='clustering')(encoder.output)
+clustering_layer = clustering_utils.ClusteringLayer(n_clusters,weights=[kmeans.cluster_centers_], name='clustering')(encoder.output)
 model = Model(inputs=autoencoder.input, outputs=[clustering_layer, autoencoder.output])
-#model.compile(loss=['kld', 'mse'], loss_weights=[1, 1], optimizer='adam')
 model.compile(loss=['kld', 'mse'], loss_weights=[1, 1], optimizer='adam')
-
-
-plot_model(model, show_shapes=True, to_file='clustering.png')
-
-
+#model.compile(loss=['kld', 'cosine_proximity'], loss_weights=[1, 1], optimizer='adam')
 
 y_pred_last = np.copy(y_pred)
+expected_autoencoder_output = np.array([[embedding_matrix[word_index] for word_index in encoded_sequence] for encoded_sequence in x_train])
+cnn_score = np.array([])
 
 for ite in range(int(maxiter)):
-    print(ite)
+    print("Interation: "+str(ite))
     if ite % update_interval == 0:
-        q, _ = model.predict(X_train)
-        p = target_distribution(q)  
+        q, _ = model.predict(x_train)
+        p = clustering_utils.target_distribution(q)  
 
         y_pred = q.argmax(1)
+        
+        #y_pred_iter,_ =  model.predict(x_test)
+        #y_pred_iter= y_pred_iter.argmax(1)
+        #cnn_results=metrics.fowlkes_mallows_score(y_test,  y_pred_iter) 
+        #cnn_score= np.append(cnn_score, cnn_results)
+        #print("CNN SCORE "+str(cnn_results))
   
         # check stop criterion
         delta_label = np.sum(y_pred != y_pred_last).astype(np.float32) / y_pred.shape[0]
@@ -86,24 +81,21 @@ for ite in range(int(maxiter)):
             print('delta_label ', delta_label, '< tol ', tol)
             print('Reached tolerance threshold. Stopping training.')
             break
-    if (index + 1) * batch_size > X_train.shape[0]:
-        loss = model.train_on_batch(x=X_train[index * batch_size::],
-                                            y=[p[index * batch_size::], X_train[index * batch_size::]])
+    if (index + 1) * batch_size > x_train.shape[0]:
+        loss = model.train_on_batch(x=x_train[index * batch_size::],
+                                            y=[p[index * batch_size::], expected_autoencoder_output[index * batch_size::]])
         index = 0
     else:
-        loss = model.train_on_batch(x=X_train[index * batch_size:(index + 1) * batch_size],
+        loss = model.train_on_batch(x=x_train[index * batch_size:(index + 1) * batch_size],
                                             y=[p[index * batch_size:(index + 1) * batch_size],
-                                            X_train[index * batch_size:(index + 1) * batch_size]])
+                                            expected_autoencoder_output[index * batch_size:(index + 1) * batch_size]])
         index += 1
     ite += 1
 
-model.save_weights("model8.h5")
+y_pred_iter,_ =  model.predict(x_test)
+y_pred_iter= y_pred_iter.argmax(1)
+cnn_results=metrics.fowlkes_mallows_score(y_test,  y_pred_iter) 
+print("CNN SCORE "+str(cnn_results))
+cnn_score= np.append(cnn_score, cnn_results)
 
-y_pred,_ =  model.predict(X_test)
-y_pred=y_pred.argmax(1)
-
-
-metrics.fowlkes_mallows_score(y_test, y_pred)  
-metrics.homogeneity_score(y_test, y_pred) 
-
-
+np.savetxt("cnn_scores.csv", cnn_score, fmt='%5s',delimiter=",")

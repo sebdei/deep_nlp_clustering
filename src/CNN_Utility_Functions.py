@@ -82,33 +82,43 @@ def CNN_autoencoder_2D(x_train, filter_size, pool_size):
     
     return model, encoder
 
-def CNN_autoencoder_2D_em(x_train, filter_size, vocab_size,feature_dimension_size,max_sequence_length,embedding_matrix ):	
+def CNN_autoencoder_2D_em(x_train, filter_size, vocab_size,feature_dimension_size,max_sequence_length,embedding_matrix, type):	
+    cluster=5
+    gpus = tf.config.experimental.list_physical_devices("GPU")
+    tf.config.experimental.set_memory_growth(gpus[0], True)
+    
+    if(type="Amazon"):
+        adjustment = 1
+    else:
+        adustment = 0
+
     model = Sequential()
     
     #Encoder Part
     model.add(Embedding(vocab_size, feature_dimension_size, input_length=max_sequence_length, trainable=False, weights=[embedding_matrix]))
     model.add(Reshape((max_sequence_length, feature_dimension_size,1)))
-    model.add(Conv2D(16, filter_size, padding='same', name='input',data_format='channels_last', activation='relu'))
-    model.add(Conv2D(8,filter_size, padding='valid', activation='relu')) 
-    model.add(Conv2D(4,filter_size, padding='valid', activation='relu'))
-    #model.add(MaxPooling2D(pool_size=(24,300), padding='same'))
+    model.add(Conv2D(32, filter_size, padding='same', name='input',data_format='channels_last', activation='relu'))
+    model.add(Conv2D(16,filter_size, padding='valid', activation='relu')) 
+    model.add(Conv2D(8,filter_size, padding='valid', activation='relu'))
+    model.add(MaxPooling2D(filter_size, padding='same'))
     model.add(Flatten())
-    model.add(Dense(5 , name='bottleneck'))
+    model.add(Dense(cluster , name='bottleneck'))
     
     #Unflatten 
-    model.add(Reshape((1, 1, 5)))
+    model.add(Reshape((1, 1, cluster)))
    
     #Decoder Part
-    model.add(Conv2DTranspose(2, (3,3), padding='valid', activation='relu')) 
-    model.add(Conv2DTranspose(4,(int(max_sequence_length/3),100), padding='valid',activation='relu'))
-    model.add(Conv2DTranspose(8,(int(max_sequence_length/3),100), padding='valid', activation='relu'))
-    model.add(Conv2DTranspose(1,(int(max_sequence_length/3),100), padding='valid', activation='sigmoid'))
+    model.add(Conv2DTranspose(8,(int(max_sequence_length/3),100), padding='valid',activation='relu'))
+    model.add(Conv2DTranspose(16,(int(max_sequence_length/3),100), padding='valid', activation='relu'))
+    model.add(Conv2DTranspose(1,(int(max_sequence_length/3+(2+adjustment)),(102+adjustment)), padding='valid', activation='sigmoid'))
+    model.summary()
     model.add(Reshape((max_sequence_length, feature_dimension_size)))
     model.summary()
     
     model.compile(optimizer='adadelta', loss='mse', metrics=["accuracy"])
-    expected_autoencoder_output = np.array([[embedding_matrix[word_index] for word_index in encoded_sequence] for encoded_sequence in padded_sequences])
-    model.fit(padded_sequences, expected_autoencoder_output, epochs=1)
+    #model.compile(optimizer='adadelta', loss='cosine_proximity', metrics=["accuracy"])
+    expected_autoencoder_output = np.array([[embedding_matrix[word_index] for word_index in encoded_sequence] for encoded_sequence in x_train])
+    model.fit(x_train, expected_autoencoder_output, epochs=5, verbose=1)
     bottleneck = model.get_layer('bottleneck')
     encoder = Model(input=model.input, output=bottleneck.output)
     
