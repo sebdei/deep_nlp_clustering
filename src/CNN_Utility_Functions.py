@@ -110,7 +110,7 @@ def CNN_autoencoder_2D_em(x_train, filter_size, vocab_size,feature_dimension_siz
     #Decoder Part
     model.add(Conv2DTranspose(8,(int(max_sequence_length/3),100), padding='valid',activation='relu'))
     model.add(Conv2DTranspose(16,(int(max_sequence_length/3),100), padding='valid', activation='relu'))
-    model.add(Conv2DTranspose(1,(int(max_sequence_length/3+(2+adjustment)),(102+adjustment)), padding='valid', activation='sigmoid'))
+    model.add(Conv2DTranspose(1,(int(max_sequence_length/3+(2+adjustment)),102), padding='valid', activation='sigmoid'))
     model.summary()
     model.add(Reshape((max_sequence_length, feature_dimension_size)))
     model.summary()
