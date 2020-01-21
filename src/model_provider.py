@@ -24,7 +24,6 @@ FASTTEXT_PRETRAINED_MODEL_ZIP_NAME = 'crawl-300d-2M.vec.zip'
 FASTTEXT_PRETRAINED_MODEL_URL = 'https://dl.fbaipublicfiles.com/fasttext/vectors-wiki/wiki.en.vec'
 
 
-
 def assure_glove_model_exists():
     if not os.path.exists(GLOVE_MODEL_BASE_DIR):
         os.makedirs(GLOVE_MODEL_BASE_DIR)
