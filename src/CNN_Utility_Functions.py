@@ -3,6 +3,7 @@ import numpy as np
 from keras.models import Sequential
 from keras.models import Model
 from keras.layers import Dense, Conv1D, Flatten, MaxPooling1D, UpSampling1D,Conv2D,MaxPooling2D,Conv2DTranspose,Reshape
+import tensorflow as tf
 
 
 
