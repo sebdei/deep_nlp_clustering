@@ -3,6 +3,7 @@ import numpy as np
 from keras.models import Sequential
 from keras.models import Model
 from keras.layers import Dense, Conv1D, Flatten, MaxPooling1D, UpSampling1D,Conv2D,MaxPooling2D,Conv2DTranspose,Reshape
+import tensorflow as tf
 
 
 
@@ -83,7 +84,8 @@ def CNN_autoencoder_2D(x_train, filter_size, pool_size):
     return model, encoder
 
 def CNN_autoencoder_2D_em(x_train, filter_size, vocab_size,feature_dimension_size,max_sequence_length,embedding_matrix, type):
-    import tensorflow as tf	
+    gpus = tf.config.experimental.list_physical_devices("GPU")
+    tf.config.experimental.set_memory_growth(gpus[0], True)
     cluster=5
     if type=="Amazon" :
         adjustment = 1
