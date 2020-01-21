@@ -16,7 +16,7 @@ import model_provider
 
 # Open files
 data, label = text_provider.provide_amazon_sequence_list()
-data, label = text_provider.provide_bbc_sequence_list()
+#data, label = text_provider.provide_bbc_sequence_list()
 
 
 #Create Bag of Words with no dimensionality reduction
@@ -38,6 +38,7 @@ model = KMeans(n_clusters=5,max_iter=100)
 clustered = model.fit(X_train)
 labels_pred = model.predict(X_test)
 metrics.fowlkes_mallows_score(y_test, labels_pred) 
+print(metrics.fowlkes_mallows_score(y_test, labels_pred) )
 
 #PCA on Bag-of-Words with no dimensionality reduction
 #Check number of components
