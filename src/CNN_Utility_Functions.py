@@ -87,7 +87,7 @@ def CNN_autoencoder_2D_em(x_train, filter_size, vocab_size,feature_dimension_siz
     gpus = tf.config.experimental.list_physical_devices("GPU")
     tf.config.experimental.set_memory_growth(gpus[0], True)
     
-    if(type="Amazon"):
+    if(type=="Amazon"):
         adjustment = 1
     else:
         adustment = 0
