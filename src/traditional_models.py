@@ -19,10 +19,10 @@ data, label = text_provider.provide_amazon_sequence_list()
 #data, label = text_provider.provide_bbc_sequence_list()
 
 
-#Create Bag of Words with no dimensionality reduction
+#Create Bag of Words with no dimensionality reduction (For BBC Data)
 #data_BoW = pd.Series([' '.join(data) for data in data])
-vectorizer = CountVectorizer()
-data_BoW = vectorizer.fit_transform(data_BoW).toarray()
+#vectorizer = CountVectorizer()
+#data_BoW = vectorizer.fit_transform(data_BoW).toarray()
 
 vectorizer = CountVectorizer()
 data_BoW = vectorizer.fit_transform(data).toarray()
