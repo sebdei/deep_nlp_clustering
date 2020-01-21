@@ -82,9 +82,10 @@ def CNN_autoencoder_2D(x_train, filter_size, pool_size):
     
     return model, encoder
 
-def CNN_autoencoder_2D_em(x_train, filter_size, vocab_size,feature_dimension_size,max_sequence_length,embedding_matrix, type):	
+def CNN_autoencoder_2D_em(x_train, filter_size, vocab_size,feature_dimension_size,max_sequence_length,embedding_matrix, type):
+    import tensorflow as tf	
     cluster=5
-    if(type=="Amazon"):
+    if type=="Amazon" :
         adjustment = 1
     else:
         adjustment = 0
