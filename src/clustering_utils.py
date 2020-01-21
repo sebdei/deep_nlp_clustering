@@ -4,7 +4,6 @@ import keras.backend as K
 
 
 class ClusteringLayer(Layer):
-
     def __init__(self, n_clusters, weights=None, alpha=1.0, **kwargs):
         super(ClusteringLayer, self).__init__(**kwargs)
         self.n_clusters = n_clusters

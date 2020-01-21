@@ -15,6 +15,18 @@ def build_embedding_matrix(word_index_dict, vocab_size, feature_dimension_size, 
     return result
 
 
+def build_embedding_matrix_fasttext(word_index_dict, vocab_size, feature_dimension_size, model):
+    result = np.zeros((vocab_size, feature_dimension_size))
+    for word, i in word_index_dict.items():
+        try:
+            embedding_vector = model.word_vec(word)
+            if embedding_vector is not None:
+                result[i] = embedding_vector
+        except KeyError:
+            pass  # embeddings with [0,0,...,0] are beeing ignored in LSTM layer due to masking
+    return result
+
+
 def preprocess_word_embedding(sequence_list, label):
     tokenizer = Tokenizer()
     tokenizer.fit_on_texts(sequence_list)
@@ -35,18 +47,6 @@ def preprocess_word_embedding(sequence_list, label):
         y_train, y_test = label[train_index], label[test_index]
 
     return (embedding_matrix, x_train, x_test, y_train, y_test)
-
-
-def build_embedding_matrix_fasttext(word_index_dict, vocab_size, feature_dimension_size, model):
-    result = np.zeros((vocab_size, feature_dimension_size))
-    for word, i in word_index_dict.items():
-        try:
-            embedding_vector = model.word_vec(word)
-            if embedding_vector is not None:
-                result[i] = embedding_vector
-        except KeyError:
-            pass  # embeddings with [0,0,...,0] are beeing ignored in LSTM layer due to masking
-    return result
 
 
 def preprocess_word_embedding_fasttext(sequence_list, label):

@@ -35,6 +35,7 @@ def do_cluster_hardening(model_file_name, dataset="bbc"):
     batch_size = 16
     max_iterations = 2223
     update_interval = 111
+
     index_array = np.arange(len(x_train))
     batch_index = 0
 
