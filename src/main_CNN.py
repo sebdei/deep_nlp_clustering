@@ -9,6 +9,7 @@ import preprocess
 import CNN_Utility_Functions
 import clustering_utils 
 from keras.models import Model
+import tensorflow as tf
 
 '''
 #BBC Data
