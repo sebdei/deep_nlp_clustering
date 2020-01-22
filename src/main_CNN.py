@@ -9,12 +9,20 @@ import preprocess
 import CNN_Utility_Functions
 import clustering_utils 
 from keras.models import Model
+import tensorflow as tf
+import pandas as pd
+import numpy as np
+from keras.models import Sequential
+from keras.models import Model
+from keras.layers import Dense, Conv1D, Flatten, MaxPooling1D, UpSampling1D,Conv2D,MaxPooling2D,Conv2DTranspose,Reshape, Embedding
+import tensorflow as tf
+
 
 '''
 #BBC Data
 n_clusters = 5
-maxiter = 1101
-update_interval = 55
+maxiter = 1120
+update_interval = 56
 tol=1e-3
 index = 0
 batch_size = 32
@@ -24,7 +32,7 @@ dimensions = 300
 
 #Amazon Data
 n_clusters = 5
-maxiter = 3569
+maxiter = 3580
 update_interval = 179
 tol=1e-3
 index = 0
@@ -41,7 +49,7 @@ vocab_size = len(embedding_matrix)
 feature_dimension_size = len(embedding_matrix[0])
 max_sequence_length = len( x_train[0])
 
-autoencoder, encoder  = CNN_Utility_Functions.CNN_autoencoder_2D_em(x_train, (300,4),vocab_size,feature_dimension_size,max_sequence_length,embedding_matrix, "BBC")
+autoencoder, encoder  = CNN_Utility_Functions.CNN_autoencoder_2D_em(x_train, (300,4),vocab_size,feature_dimension_size,max_sequence_length,embedding_matrix, "Amazon")
 #autoencoder, encoder  = CNN_Utility_Functions.CNN_autoencoder_2D_em(x_train, (300,4),vocab_size,feature_dimension_size,max_sequence_length,embedding_matrix, "Amazon")
 
 autoencoder.save_weights("auto_encoder.h5")
