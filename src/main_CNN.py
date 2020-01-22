@@ -49,7 +49,7 @@ vocab_size = len(embedding_matrix)
 feature_dimension_size = len(embedding_matrix[0])
 max_sequence_length = len( x_train[0])
 
-autoencoder, encoder  = CNN_Utility_Functions.CNN_autoencoder_2D_em(x_train, (300,4),vocab_size,feature_dimension_size,max_sequence_length,embedding_matrix, "BBC")
+autoencoder, encoder  = CNN_Utility_Functions.CNN_autoencoder_2D_em(x_train, (300,4),vocab_size,feature_dimension_size,max_sequence_length,embedding_matrix, "Amazon")
 #autoencoder, encoder  = CNN_Utility_Functions.CNN_autoencoder_2D_em(x_train, (300,4),vocab_size,feature_dimension_size,max_sequence_length,embedding_matrix, "Amazon")
 
 autoencoder.save_weights("auto_encoder.h5")
