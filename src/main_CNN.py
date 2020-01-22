@@ -14,8 +14,8 @@ import tensorflow as tf
 '''
 #BBC Data
 n_clusters = 5
-maxiter = 1101
-update_interval = 55
+maxiter = 1120
+update_interval = 56
 tol=1e-3
 index = 0
 batch_size = 32
@@ -25,7 +25,7 @@ dimensions = 300
 
 #Amazon Data
 n_clusters = 5
-maxiter = 3569
+maxiter = 3580
 update_interval = 179
 tol=1e-3
 index = 0
