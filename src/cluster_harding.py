@@ -9,7 +9,7 @@ import text_provider
 import pretrain_lstm_autoencoder
 
 
-def do_cluster_hardening(model_file_name, dataset="bbc"):
+def do_cluster_hardening(model_file_name, dataset, max_iterations, batch_size, update_interval):
     text, label = text_provider.provide_sequence_list(dataset)
     embedding_matrix, x_train, x_test, y_train, y_test = preprocess.preprocess_word_embedding_fasttext(text, label)
 
@@ -31,18 +31,13 @@ def do_cluster_hardening(model_file_name, dataset="bbc"):
 
     expected_autoencoder_output = np.array([[embedding_matrix[word_index] for word_index in encoded_sequence] for encoded_sequence in x_train])
 
-    # Hyperparams
-    batch_size = 16
-    max_iterations = 2223
-    update_interval = 111
-
     index_array = np.arange(len(x_train))
     batch_index = 0
 
     clusterings_result_train = pd.DataFrame()
     clusterings_result_test = pd.DataFrame()
 
-    for i in range(int(max_iterations)):
+    for i in range(int(max_iterations+1)):
         print("Iteration: %1d / %1d" % (i, max_iterations))
         if i % update_interval == 0:
             similarity_scores_train, _ = encoder_cluster_model.predict(x_train)

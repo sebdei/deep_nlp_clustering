@@ -23,4 +23,3 @@ def plot_test_sets(test_1, test_2, test_3):
     plt.legend()
     plt.savefig('plot.png')
     plt.clf()
-    

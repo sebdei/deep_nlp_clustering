@@ -1,9 +1,7 @@
-import csv
 import re
 import pandas as pd
 import numpy as np
 from sklearn.datasets import load_files
-import preprocess
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
@@ -32,7 +30,7 @@ def provide_bbc_sequence_list():
     return text.flatten(), label
 
 
-def provide_sequence_list(dataset='bbc'):
+def provide_sequence_list(dataset):
     if (dataset == 'bbc'):
         text, label = provide_bbc_sequence_list()
     elif (dataset == 'amazon_reviews'):
@@ -43,6 +41,6 @@ def provide_sequence_list(dataset='bbc'):
 
 def removeStopWords(text):
     en_stop = set(stopwords.words('english'))
-    word_tokens = word_tokenize(text) 
+    word_tokens = word_tokenize(text)
     filtered_sentence = [w for w in word_tokens if not w in en_stop]
     return filtered_sentence
