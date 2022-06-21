@@ -2,7 +2,7 @@ gensim==3.8.0
 keras==2.3.1
 keras-applications==1.0.8
 keras-preprocessing==1.1.0
-numpy==1.17.2
+numpy==1.22.0
 pandas==0.24.1
 pydot==1.4.1
 scikit-learn==0.21.3
